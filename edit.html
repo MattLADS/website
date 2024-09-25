@@ -1,6 +1,392 @@
-<h1>Editing {{.Title}}</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Styling for the main body */
+        body {
+            background-color: #006400; /* Dark green */
+            color: white;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
 
-<form action="/save/{{.Title}}" method="POST">
-<div><textarea name="body" rows="20" cols="80">{{printf "%s" .Body}}</textarea></div>
-<div><input type="submit" value="Save"></div>
-</form>
+        /* Sidebar styling */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background-color: #228B22; /* Forest green */
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 10px;
+            color: white;
+        }
+
+        /* Sidebar title styling */
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: gold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        /* Sidebar options link styling */
+        .sidebar-options a {
+            text-decoration: none;
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: block;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        /* Hover effect for sidebar options */
+        .sidebar-options a:hover {
+            background-color: #1a6e1a;
+        }
+
+        /* Main content area styling */
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+            width: calc(100% - 270px);
+            overflow-y: auto;
+        }
+
+        /* Dynamic content box styling */
+        .dynamic-content {
+            background-color: #004d00;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header styling */
+        h2 {
+            margin: 0 0 10px 0;
+            color: gold;
+        }
+
+        /* Calendar container styling */
+        .calendar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Calendar header (month navigation) */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* Calendar grid layout */
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr); /* 7 columns for the days of the week */
+            gap: 5px;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        /* Weekday label styling */
+        .weekday {
+            font-weight: bold;
+            color: gold;
+            margin-bottom: 5px;
+        }
+
+        /* Individual day styling */
+        .day {
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #2e8b57; /* Medium green for days */
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Highlight today's date */
+        .day.today {
+            background-color: gold; /* Highlight today's date */
+            color: black;
+        }
+
+        /* Highlight days with events */
+        .day.event {
+            background-color: #ffa500; /* Orange for days with events */
+        }
+
+        /* Event list styling */
+        .event-list {
+            margin-top: 20px;
+            background-color: #003300; /* Dark green for event list */
+            padding: 10px;
+            border-radius: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        /* Individual event item styling */
+        .event-item {
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #006400; /* Green for event items */
+            border-radius: 4px;
+            color: white;
+        }
+
+        /* Form styling for adding events */
+        .add-event-form {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Input and button styling in add-event form */
+        .add-event-form input,
+        .add-event-form button {
+            padding: 8px;
+            border-radius: 4px;
+            border: none;
+        }
+
+        /* Input field for adding events */
+        .add-event-form input {
+            flex: 1;
+        }
+
+        /* Add event button styling */
+        .add-event-form button {
+            background-color: blue; /* Blue for buttons */
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Hover effect for add event button */
+        .add-event-form button:hover {
+            background-color: darkblue; /* Dark blue on hover */
+        }
+
+        /* Navigation button styling for month navigation */
+        .nav-button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* Hover effect for navigation buttons */
+        .nav-button:hover {
+            background-color: darkblue;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar with navigation options -->
+    <div class="sidebar">
+        <div class="sidebar-title">MATTLADS</div>
+        <div class="sidebar-options">
+            <a onclick="showContent('class-feed')">Class Feed</a>
+            <a onclick="showContent('notifications')">Notifications</a>
+            <a onclick="showContent('dms')">DMs</a>
+            <a onclick="showContent('calendar')">Calendar</a>
+            <a onclick="showContent('search')">Search</a>
+            <a onclick="showContent('settings')">Settings</a>
+        </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="content">
+        <div id="dynamic-content" class="dynamic-content">
+            <h2>Welcome!</h2>
+            <p>Select an option from the sidebar to see its content here.</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize an object to store events
+        let events = {};
+
+        // Function to display content based on selected option
+        function showContent(option) {
+            const content = document.getElementById('dynamic-content');
+            let title, text;
+
+            // Check which option was selected and display relevant content
+            if (option === 'calendar') {
+                content.innerHTML = `
+                    <h2>Calendar</h2>
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <button class="nav-button" onclick="changeMonth(-1)">&#9664;</button>
+                            <span id="calendar-title"></span>
+                            <button class="nav-button" onclick="changeMonth(1)">&#9654;</button>
+                        </div>
+                        <div class="calendar">
+                            <div class="weekday">Sun</div>
+                            <div class="weekday">Mon</div>
+                            <div class="weekday">Tue</div>
+                            <div class="weekday">Wed</div>
+                            <div class="weekday">Thu</div>
+                            <div class="weekday">Fri</div>
+                            <div class="weekday">Sat</div>
+                            <div id="calendar-grid" class="calendar-grid"></div>
+                        </div>
+                        <div class="add-event-form">
+                            <input type="text" id="event-input" placeholder="Add an event...">
+                            <button onclick="addEvent()">Add Event</button>
+                        </div>
+                        <div id="event-list" class="event-list"></div>
+                    </div>`;
+                renderCalendar();
+            } else {
+                // Display text content for other options
+                switch (option) {
+                    case 'class-feed':
+                        title = 'Class Feed';
+                        text = 'This is the Class Feed where you can view all the class updates.';
+                        break;
+                    case 'notifications':
+                        title = 'Notifications';
+                        text = 'Here are your latest notifications.';
+                        break;
+                    case 'dms':
+                        title = 'DMs';
+                        text = 'Check your direct messages here.';
+                        break;
+                    case 'search':
+                        title = 'Search';
+                        text = 'Search for anything within your class materials.';
+                        break;
+                    case 'settings':
+                        title = 'Settings';
+                        text = 'Adjust your account and application settings here.';
+                        break;
+                    default:
+                        title = 'Welcome!';
+                        text = 'Select an option from the sidebar to see its content here.';
+                }
+                content.innerHTML = `<h2>${title}</h2><p>${text}</p>`;
+            }
+        }
+
+        // Variables for the current year and month
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+
+        // Function to render the calendar based on current year and month
+        function renderCalendar() {
+            const today = new Date();
+            const calendarTitle = document.getElementById('calendar-title');
+            const calendarGrid = document.getElementById('calendar-grid');
+            calendarGrid.innerHTML = '';
+
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            calendarTitle.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            // Calculate the first day and the number of days in the month
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            // Render empty days for the first week
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement('div');
+                calendarGrid.appendChild(emptyDiv);
+            }
+
+            // Render each day in the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('day');
+                dayDiv.textContent = day;
+
+                // Highlight today's date
+                if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+                    dayDiv.classList.add('today');
+                }
+
+                // Highlight days with events
+                const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
+                if (events[dateKey]) {
+                    dayDiv.classList.add('event');
+                    dayDiv.onclick = () => showEvents(dateKey);
+                } else {
+                    dayDiv.onclick = () => showEvents(dateKey);
+                }
+                calendarGrid.appendChild(dayDiv);
+            }
+        }
+
+        // Function to change the month displayed in the calendar
+        function changeMonth(direction) {
+            currentMonth += direction;
+
+            // Adjust the year if necessary
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+
+            renderCalendar();
+        }
+
+        // Function to add events to a selected date
+        function addEvent() {
+            const input = document.getElementById('event-input');
+            const eventText = input.value.trim();
+
+            if (eventText) {
+                const dateKey = `${currentYear}-${currentMonth + 1}-${new Date().getDate()}`;
+                if (!events[dateKey]) {
+                    events[dateKey] = [];
+                }
+                events[dateKey].push(eventText);
+                input.value = '';
+                renderCalendar();
+                showEvents(dateKey);
+            }
+        }
+
+        // Function to show events for a selected date
+        function showEvents(dateKey) {
+            const eventList = document.getElementById('event-list');
+            eventList.innerHTML = '';
+
+            if (events[dateKey]) {
+                events[dateKey].forEach((event, index) => {
+                    const eventItem = document.createElement('div');
+                    eventItem.classList.add('event-item');
+                    eventItem.textContent = event;
+                    eventList.appendChild(eventItem);
+                });
+            } else {
+                eventList.innerHTML = '<p>No events for this day.</p>';
+            }
+        }
+
+        // Initial call to show welcome content
+        showContent();
+    </script>
+</body>
+</html>
