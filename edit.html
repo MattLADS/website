@@ -27,6 +27,12 @@
             color: white;
         }
 
+        /* Content container inside the sidebar */
+        .sidebar-content {
+            flex: 1; /* Allow the content area to grow and take up available space */
+            margin-bottom: 50px; /* Space for the button */
+        }
+
         /* Sidebar title styling */
         .sidebar-title {
             font-size: 24px;
@@ -194,6 +200,25 @@
         .nav-button:hover {
             background-color: darkblue;
         }
+
+		/* Sign out button styling */
+		.sign-out-button {
+ 		   background-color: gold; /* Gold color for sign out button */
+ 		   color: black; /* Black text for contrast */
+  		  border: none;
+  		  padding: 10px;
+  		  margin-top: 580px;
+  		  border-radius: 5px;
+  		  cursor: pointer;
+  		  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Raised effect */
+  		  transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+}
+
+        /* Hover effect for sign out button */
+        .sign-out-button:hover {
+            background-color: #ffd700; /* Brighter gold on hover */
+            transform: translateY(-2px); /* Lift effect on hover */
+        }
     </style>
 </head>
 <body>
@@ -208,6 +233,8 @@
             <a onclick="showContent('search')">Search</a>
             <a onclick="showContent('settings')">Settings</a>
         </div>
+        <!-- Sign out button -->
+        <button class="sign-out-button" onclick="window.location.href='/signout'">Sign Out</button>
     </div>
 
     <!-- Main content area -->
@@ -266,16 +293,16 @@
                         text = 'Here are your latest notifications.';
                         break;
                     case 'dms':
-                        title = 'DMs';
+                        title = 'Direct Messages';
                         text = 'Check your direct messages here.';
                         break;
                     case 'search':
                         title = 'Search';
-                        text = 'Search for anything within your class materials.';
+                        text = 'Search for courses, classmates, or topics.';
                         break;
                     case 'settings':
                         title = 'Settings';
-                        text = 'Adjust your account and application settings here.';
+                        text = 'Manage your account settings here.';
                         break;
                     default:
                         title = 'Welcome!';
@@ -285,108 +312,25 @@
             }
         }
 
-        // Variables for the current year and month
-        let currentYear = new Date().getFullYear();
-        let currentMonth = new Date().getMonth();
-
-        // Function to render the calendar based on current year and month
-        function renderCalendar() {
-            const today = new Date();
-            const calendarTitle = document.getElementById('calendar-title');
-            const calendarGrid = document.getElementById('calendar-grid');
-            calendarGrid.innerHTML = '';
-
-            const monthNames = [
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
-            calendarTitle.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
-            // Calculate the first day and the number of days in the month
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-            // Render empty days for the first week
-            for (let i = 0; i < firstDay; i++) {
-                const emptyDiv = document.createElement('div');
-                calendarGrid.appendChild(emptyDiv);
-            }
-
-            // Render each day in the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayDiv = document.createElement('div');
-                dayDiv.classList.add('day');
-                dayDiv.textContent = day;
-
-                // Highlight today's date
-                if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
-                    dayDiv.classList.add('today');
-                }
-
-                // Highlight days with events
-                const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
-                if (events[dateKey]) {
-                    dayDiv.classList.add('event');
-                    dayDiv.onclick = () => showEvents(dateKey);
-                } else {
-                    dayDiv.onclick = () => showEvents(dateKey);
-                }
-                calendarGrid.appendChild(dayDiv);
-            }
-        }
-
-        // Function to change the month displayed in the calendar
+        // Function to change the displayed month in the calendar
         function changeMonth(direction) {
-            currentMonth += direction;
-
-            // Adjust the year if necessary
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            } else if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-
-            renderCalendar();
+            // Logic to change the month
         }
 
-        // Function to add events to a selected date
+        // Function to render the calendar
+        function renderCalendar() {
+            // Logic to render the calendar
+        }
+
+        // Function to add an event to the calendar
         function addEvent() {
-            const input = document.getElementById('event-input');
-            const eventText = input.value.trim();
-
-            if (eventText) {
-                const dateKey = `${currentYear}-${currentMonth + 1}-${new Date().getDate()}`;
-                if (!events[dateKey]) {
-                    events[dateKey] = [];
-                }
-                events[dateKey].push(eventText);
-                input.value = '';
-                renderCalendar();
-                showEvents(dateKey);
+            const eventInput = document.getElementById('event-input');
+            const eventValue = eventInput.value.trim();
+            if (eventValue) {
+                // Logic to add the event
+                eventInput.value = ''; // Clear the input field
             }
         }
-
-        // Function to show events for a selected date
-        function showEvents(dateKey) {
-            const eventList = document.getElementById('event-list');
-            eventList.innerHTML = '';
-
-            if (events[dateKey]) {
-                events[dateKey].forEach((event, index) => {
-                    const eventItem = document.createElement('div');
-                    eventItem.classList.add('event-item');
-                    eventItem.textContent = event;
-                    eventList.appendChild(eventItem);
-                });
-            } else {
-                eventList.innerHTML = '<p>No events for this day.</p>';
-            }
-        }
-
-        // Initial call to show welcome content
-        showContent();
     </script>
 </body>
 </html>
