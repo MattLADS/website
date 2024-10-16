@@ -160,7 +160,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
         // If no cookie is found or the cookie value does not indicate authentication,
         // redirect the user to the sign-in page.
         if err != nil || cookie.Value != "authenticated" {
-            http.Redirect(w, r, "/signin", http.StatusFound) // Redirect to sign-in.
+            http.Redirect(w, r, "/", http.StatusFound) // Redirect to sign-in.
             return // Stop further processing.
         }
 
@@ -290,7 +290,7 @@ func main() {
 
     // Set up HTTP handlers for different routes.
     http.HandleFunc("/signup", SignUpHandler)
-    http.HandleFunc("/signin", SignInHandler)
+    http.HandleFunc("/", SignInHandler)
     http.HandleFunc("/signout", SignOutHandler)
 
     http.HandleFunc("/view/", authMiddleware(viewHandler))
