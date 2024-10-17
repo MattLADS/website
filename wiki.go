@@ -7,11 +7,8 @@ package main
 
 import (
     "html/template"
-    "log"
     "net/http"
     "os"
-    "bufio"
-    "strings"
 )
 
 // Page structure represents a wiki page with a title and body.
@@ -102,31 +99,5 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
         http.Error(w, err.Error(), http.StatusInternalServerError)
     }
 }
-
-
-func main() {
-    // Load existing user credentials from the users.txt file at startup.
-    err := LoadUsers()
-    if err != nil {
-        log.Fatalf("Error loading users: %v", err)
-    }
-
-    // Set up HTTP handlers for different routes.
-    http.HandleFunc("/signup", SignUpHandler)
-    http.HandleFunc("/", SignInHandler)
-    http.HandleFunc("/signout", SignOutHandler)
-
-    http.HandleFunc("/view/", authMiddleware(viewHandler))
-    http.HandleFunc("/edit/", authMiddleware(editHandler))
-    http.HandleFunc("/save/", authMiddleware(saveHandler))
-
-    // Start the HTTP server on port 8080.
-    log.Println("Starting server on :8080")
-    err = http.ListenAndServe(":8080", nil)
-    if err != nil {
-        log.Fatalf("Error starting server: %v", err)
-    }
-}
-
 
 //hi
