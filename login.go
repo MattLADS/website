@@ -133,7 +133,9 @@ func main() {
     http.HandleFunc("/signout", SignOutHandler)
 
     // Example of a protected route.
-    http.HandleFunc("/view/home", authMiddleware(HomeHandler))
+    http.HandleFunc("/view/", authMiddleware(ViewHandler))
+    http.HandleFunc("/edit/", authMiddleware(EditHandler))
+    http.HandleFunc("/save/", authMiddleware(SaveHandler))
 
     log.Println("Server started at :8080")
     log.Fatal(http.ListenAndServe(":8080", nil))

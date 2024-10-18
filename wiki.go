@@ -1,8 +1,3 @@
-// Copyright 2010 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-//go:build ignore
 package main
 
 import (
@@ -38,7 +33,7 @@ func loadPage(title string) (*Page, error) {
 }
 
 // viewHandler renders a wiki page. If the page doesn't exist, it redirects to the edit page.
-func viewHandler(w http.ResponseWriter, r *http.Request) {
+func ViewHandler(w http.ResponseWriter, r *http.Request) {
     // Extract the title from the URL (e.g., "/view/SomePage" -> "SomePage").
     title := r.URL.Path[len("/view/"):]
     p, err := loadPage(title)
@@ -53,7 +48,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 
 // editHandler renders an edit form to modify a wiki page.
 // If the page doesn't exist, it creates a new one.
-func editHandler(w http.ResponseWriter, r *http.Request) {
+func EditHandler(w http.ResponseWriter, r *http.Request) {
     // Extract the title from the URL (e.g., "/edit/SomePage" -> "SomePage").
     title := r.URL.Path[len("/edit/"):]
     p, err := loadPage(title)
@@ -67,7 +62,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 
 // saveHandler saves the contents of an edited page.
 // The content is taken from the POST form and saved to a text file.
-func saveHandler(w http.ResponseWriter, r *http.Request) {
+func SaveHandler(w http.ResponseWriter, r *http.Request) {
     // Extract the title from the URL (e.g., "/save/SomePage" -> "SomePage").
     title := r.URL.Path[len("/save/"):]
     // Get the body content from the form submission.

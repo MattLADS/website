@@ -256,7 +256,7 @@
 
             // Check which option was selected and display relevant content
             if (option === 'calendar') {
-                content.innerHTML = `
+                content.innerHTML = 
                     <h2>Calendar</h2>
                     <div class="calendar-container">
                         <div class="calendar-header">
@@ -279,7 +279,7 @@
                             <button onclick="addEvent()">Add Event</button>
                         </div>
                         <div id="event-list" class="event-list"></div>
-                    </div>`;
+                    </div>;
                 renderCalendar();
             } else {
                 // Display text content for other options
@@ -308,7 +308,7 @@
                         title = 'Welcome!';
                         text = 'Select an option from the sidebar to see its content here.';
                 }
-                content.innerHTML = `<h2>${title}</h2><p>${text}</p>`;
+                content.innerHTML = <h2>${title}</h2><p>${text}</p>;
             }
         }
 
