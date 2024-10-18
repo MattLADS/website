@@ -1,2 +1,0 @@
-# all the user credentials will be saved here
-djbirdsall:cheese123
