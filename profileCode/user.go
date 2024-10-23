@@ -1,20 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 )
 
 // profile handler
 func profileHandler(w http.ResponseWriter, r *http.Request) {
-	// get the username from session
-	username, exists := getSessionUser(r)
-	if !exists {
-		http.Error(w, "You need to log in to view your profile.", http.StatusUnauthorized)
+	// using Kunj's session check method
+	cookie, err := r.Cookie("session_token")
+	if err != nil || cookie.Value != "authenticated" {
+		http.Redirect(w, r, "/signin", http.StatusFound)
 		return
 	}
 
 	// render profile page with user's info
 	http.ServeFile(w, r, "templates/profile.html")
-	fmt.Fprintf(w, "Welcome %s! This is your profile.", username)
 }
