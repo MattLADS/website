@@ -97,11 +97,9 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 }
 
 func main() {
-	// Load existing user credentials from the users.txt file at startup.
-	err := LoadUsers()
-	if err != nil {
-		log.Fatalf("Error loading users: %v", err)
-	}
+	// Load existing user credentials from the database at startup.
+	InitializeDB()
+	defer db.Close()
 
 	// Set up HTTP handlers for different routes.
 	http.HandleFunc("/signup", SignUpHandler)
@@ -112,13 +110,14 @@ func main() {
 
 	http.HandleFunc("/topic", authMiddleware(TopicHandler))
 	http.HandleFunc("/new-topic", authMiddleware(NewTopicHandler))
-	http.HandleFunc("/view/", authMiddleware(viewHandler))
-	http.HandleFunc("/edit/", authMiddleware(editHandler))
-	http.HandleFunc("/save/", authMiddleware(saveHandler))
+	http.HandleFunc("/new-comment", authMiddleware(NewCommentHandler))
+	http.HandleFunc("/view/", authMiddleware(ViewHandler))
+	http.HandleFunc("/edit/", authMiddleware(EditHandler))
+	http.HandleFunc("/save/", authMiddleware(SaveHandler))
 
 	// Start the HTTP server on port 8080.
 	log.Println("Starting server on :8080")
-	err = http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}

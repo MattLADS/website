@@ -75,37 +75,22 @@
 <div class="container">
     <h1>Post a New Topic</h1>
     <div class="new-topic">
-        <input type="text" placeholder="Topic Title" id="topicTitle">
-        <textarea placeholder="Write your post here..." id="topicContent" rows="5"></textarea>
-        <button type="button" onclick="postNewTopic()">Post</button>
+        <!-- Form to post a new topic -->
+        <form method="POST" action="/new-topic">
+            <input type="text" name="title" placeholder="Topic Title" required>
+            <textarea name="content" placeholder="Write your post here..." rows="5" required></textarea>
+            <button type="submit">Post</button>
+        </form>
     </div>
-
     <h2>Recent Topics</h2>
-    <ul class="topic-list" id="topicList">
-        <!-- Topics will be rendered dynamically from Go -->
+    <ul class="topic-list">
+        {{range .}}
+        <li><a href="/topic?title={{.Title}}">{{.Title}}</a></li>
+        {{else}}
+        <li>No topics available</li>
+        {{end}}
     </ul>
 </div>
-
-<script>
-    function postNewTopic() {
-        const title = document.getElementById('topicTitle').value;
-        const content = document.getElementById('topicContent').value;
-
-        if (title && content) {
-            const newTopic = document.createElement('li');
-            const topicLink = document.createElement('a');
-            topicLink.href = `/topic?title=${encodeURIComponent(title)}`;
-            topicLink.textContent = title;
-            newTopic.appendChild(topicLink);
-            document.getElementById('topicList').appendChild(newTopic);
-            
-            document.getElementById('topicTitle').value = '';
-            document.getElementById('topicContent').value = '';
-        } else {
-            alert('Please fill out both fields.');
-        }
-    }
-</script>
 
 </body>
 </html>

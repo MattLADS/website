@@ -122,22 +122,3 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("home.html")
 	t.Execute(w, nil)
 }
-
-// main function to start the server and initialize the database.
-func main() {
-	InitializeDB()
-	defer db.Close()
-
-	// Define routes.
-	http.HandleFunc("/signup", SignUpHandler)
-	http.HandleFunc("/", SignInHandler)
-	http.HandleFunc("/signout", SignOutHandler)
-
-	// Example of a protected route.
-	http.HandleFunc("/view/", authMiddleware(ViewHandler))
-	http.HandleFunc("/edit/", authMiddleware(EditHandler))
-	http.HandleFunc("/save/", authMiddleware(SaveHandler))
-
-	log.Println("Server started at :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
