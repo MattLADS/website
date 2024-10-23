@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:matt_lads_app/components/my_settings_tile.dart';
 import 'package:matt_lads_app/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -16,12 +17,13 @@ class Settings extends StatelessWidget {
       ),
       body: Column(
         children: [
-          ListTile(
-            title: Text("Dark Mode"),
-            trailing: CupertinoSwitch(
-              onChanged: (value) => 
-                Provider.of<ThemeProvider>(context, listen: false).toggleTheme(),
-              value: Provider.of<ThemeProvider>(context, listen: false).isDarkMode,
+          //Dark mode toggle
+            MySettingsTile(
+              title: "Dark Mode",
+              action: CupertinoSwitch(
+                onChanged: (value) => 
+                  Provider.of<ThemeProvider>(context, listen: false).toggleTheme(),
+                value: Provider.of<ThemeProvider>(context, listen: false).isDarkMode,
             ),
           ),
       ],)

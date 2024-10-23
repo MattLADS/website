@@ -12,6 +12,8 @@ class MyDrawer extends StatelessWidget {
     return Drawer(
       backgroundColor: Theme.of(context).colorScheme.surface,
       child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25.0),
         child: Column(
           children: [
           // app logo
@@ -23,11 +25,14 @@ class MyDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
+          
           Divider(
             indent: 25,
             endIndent: 25,
             color: Theme.of(context).colorScheme.secondary,
           ),
+        
+          const SizedBox(height: 10),
 
           //home 
           MyDrawerTile(
@@ -74,6 +79,6 @@ class MyDrawer extends StatelessWidget {
         ],
       )
     )
-    );
+    ));
   }
 }

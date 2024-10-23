@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:matt_lads_app/pages/login_page.dart';
 import 'package:provider/provider.dart';
 import 'package:matt_lads_app/pages/feed.dart';
 import 'package:matt_lads_app/themes/theme_provider.dart';
-import 'package:matt_lads_app/themes/light_mode.dart';
 
 void main() {
   runApp(
@@ -20,7 +20,8 @@ class PostApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: LoginPage(),
+      //home: HomePage(),
       theme: Provider.of<ThemeProvider>(context). themeData,
     );
   }

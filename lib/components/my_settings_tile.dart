@@ -8,12 +8,24 @@ class MySettingsTile extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text("Dark Mode"),
-      trailing: CupertinoSwitch(
-        onChanged: (value) => 
-          Provider.of<ThemeProvider>(context, listen: false).toggleTheme(),
-        value: Provider.of<ThemeProvider>(context, listen: false).isDarkMode,
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondary,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      margin: EdgeInsets.only(left: 25, right: 25, top: 10), 
+
+      padding: const EdgeInsets.all(25),
+      
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          action,
+        ],
       ),
     );
   } 
