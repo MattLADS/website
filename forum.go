@@ -60,11 +60,12 @@ func NewTopicHandler(w http.ResponseWriter, r *http.Request) {
 		// Get title and content from the form
 		title := r.FormValue("title")
 		content := r.FormValue("content")
+		comments := []string{}
 
 		// Check if title and content are not empty
 		if title != "" && content != "" {
 			// Append the new topic to the topics list
-			topics = append(topics, Topic{Title: title, Content: content})
+			topics = append(topics, Topic{Title: title, Content: content, Comments: comments})
 
 			// Redirect back to the homepage
 			http.Redirect(w, r, "/forum/", http.StatusSeeOther)
@@ -91,15 +92,10 @@ func NewCommentHandler(w http.ResponseWriter, r *http.Request) {
 		// Check if title and comment are not empty
 		if title != "" && comment != "" {
 			// Append the new comment to the comments list
-			for _, topic := range topics {
-				tmpl, err := template.ParseFiles("topic.html")
-				if err != nil {
-					log.Fatal(err)
+			for i := range topics {
+				if topics[i].Title == title {
+					topics[i].Comments = append(topics[i].Comments, comment)
 				}
-				if topic.Title == title {
-					topic.Comments = append(topic.Comments, comment)
-				}
-				tmpl.Execute(w, topic.Comments)
 			}
 			url := fmt.Sprintf("/topic?title=%s", title)
 			http.Redirect(w, r, url, http.StatusSeeOther)
