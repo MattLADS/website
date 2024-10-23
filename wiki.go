@@ -1,8 +1,3 @@
-// Copyright 2010 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-//go:build ignore
 package main
 
 import (
@@ -10,8 +5,6 @@ import (
     "log"
     "net/http"
     "os"
-    "bufio"
-    "strings"
 )
 
 // Page structure represents a wiki page with a title and body.
@@ -103,7 +96,6 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
     }
 }
 
-
 func main() {
     // Load existing user credentials from the users.txt file at startup.
     err := LoadUsers()
@@ -116,6 +108,10 @@ func main() {
     http.HandleFunc("/", SignInHandler)
     http.HandleFunc("/signout", SignOutHandler)
 
+    http.HandleFunc("/forum/", authMiddleware(ForumHandler))
+
+	http.HandleFunc("/topic", authMiddleware(TopicHandler))
+	http.HandleFunc("/new-topic", authMiddleware(NewTopicHandler))
     http.HandleFunc("/view/", authMiddleware(viewHandler))
     http.HandleFunc("/edit/", authMiddleware(editHandler))
     http.HandleFunc("/save/", authMiddleware(saveHandler))
@@ -127,6 +123,3 @@ func main() {
         log.Fatalf("Error starting server: %v", err)
     }
 }
-
-
-//hi

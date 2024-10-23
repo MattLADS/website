@@ -1,8 +1,8 @@
 package main
 
 import (
+	"html/template"
     "net/http"
-    "log"
     "os"
     "bufio"
     "strings"
