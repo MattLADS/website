@@ -2,183 +2,142 @@ package main
 
 import (
 	"html/template"
-    "net/http"
-    "os"
-    "bufio"
-    "strings"
+	"log"
+	"net/http"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-// User structure represents a user with a username and password.
+// User structure represents a user with a unique ID, username, and password.
 type User struct {
-    Username string
-    Password string
+	ID       uint   `gorm:"primaryKey"`
+	Username string `gorm:"unique"`
+	Password string
 }
 
-var users = make(map[string]string) // In-memory user storage to hold username-password pairs
+var db *gorm.DB
 
-// Path to the user file where user credentials are stored.
-const userFile = "users.txt"
+// InitializeDB sets up the database connection and creates the users table if it doesn't exist.
+func InitializeDB() {
+	var err error
+	db, err = gorm.Open("sqlite3", "users.db")
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
 
-// LoadUsers loads existing user credentials from the users.txt file into the in-memory map.
-func LoadUsers() error {
-    file, err := os.Open(userFile) // Attempt to open the user file
-    if err != nil {
-        return err // Return an error if the file does not exist or can't be opened.
-    }
-    defer file.Close() // Ensure the file is closed when the function exits.
+	// Enable foreign key constraints.
+	db.Exec("PRAGMA foreign_keys = ON;")
 
-    scanner := bufio.NewScanner(file) // Create a scanner to read the file line by line.
-    for scanner.Scan() {
-        line := scanner.Text() // Get the current line.
-        parts := strings.SplitN(line, ":", 2) // Split the line into username and password at the first colon.
-        if len(parts) == 2 { // Ensure we have both username and password.
-            username := parts[0]
-            password := parts[1]
-            users[username] = password // Add the username and password to the in-memory storage.
-        }
-    }
-
-    return scanner.Err() // Return any error encountered during scanning.
+	// Automatically migrate the User struct to create/update the users table.
+	db.AutoMigrate(&User{})
 }
 
-// saveUser saves a new user's credentials to the users.txt file.
-func saveUser(username, password string) error {
-    file, err := os.OpenFile(userFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600) // Open the file for appending.
-    if err != nil {
-        return err // Return error if file can't be opened.
-    }
-    defer file.Close() // Ensure the file is closed when the function exits.
-
-    // Write the username and password to the file, separated by a colon, followed by a newline.
-    _, err = file.WriteString(username + ":" + password + "\n")
-    return err // Return any error encountered during the write operation.
-}
-
-// authMiddleware is a middleware function that checks if the user is authenticated before proceeding to the next handler.
+// authMiddleware is a middleware function that checks if the user is authenticated.
 func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
-        // Check for the session cookie in the user's browser.
-        cookie, err := r.Cookie("session_token")
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("session_token")
 
-        // If no cookie is found or the cookie value does not indicate authentication,
-        // redirect the user to the sign-in page.
-        if err != nil || cookie.Value != "authenticated" {
-            http.Redirect(w, r, "/", http.StatusFound) // Redirect to sign-in.
-            return // Stop further processing.
-        }
+		if err != nil || cookie.Value != "authenticated" {
+			http.Redirect(w, r, "/signin", http.StatusFound) // Redirect to sign-in if not authenticated.
+			return
+		}
 
-        // If the user is authenticated, proceed to the next handler.
-        next(w, r)
-    }
+		next(w, r) // Proceed to the next handler if authenticated.
+	}
 }
 
 // SignUpHandler handles user registration (sign-up).
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "GET" {
-        // Render the sign-up page when a GET request is made.
-        t, _ := template.ParseFiles("signup.html")
-        t.Execute(w, nil)
-    } else if r.Method == "POST" {
-        // Handle form submission for user registration.
-        username := r.FormValue("username") // Get the username from the form.
-        password := r.FormValue("password") // Get the password from the form.
+	if r.Method == "GET" {
+		t, _ := template.ParseFiles("signup.html")
+		t.Execute(w, nil)
+	} else if r.Method == "POST" {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
 
-        // Check if the username already exists in the in-memory storage.
-        if _, exists := users[username]; exists {
-            http.Error(w, "Username already exists. Please choose another one.", http.StatusConflict) // Inform user of conflict.
-            return
-        }
+		// Check if the username already exists.
+		var existingUser User
+		if err := db.Where("username = ?", username).First(&existingUser).Error; err == nil {
+			http.Error(w, "Username already exists. Please choose another one.", http.StatusConflict)
+			return
+		}
 
-        // Store the new user's credentials in memory.
-        users[username] = password
+		// Create a new user record.
+		newUser := User{Username: username, Password: password}
+		if err := db.Create(&newUser).Error; err != nil {
+			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
+			return
+		}
 
-        // Save the new user credentials to the users.txt file.
-        err := saveUser(username, password) 
-        if err != nil {
-            http.Error(w, "Failed to save user credentials.", http.StatusInternalServerError) // Handle file save error.
-            return
-        }
+		http.SetCookie(w, &http.Cookie{
+			Name:  "session_token",
+			Value: "authenticated",
+			Path:  "/",
+		})
 
-        // Set a session cookie to mark the user as authenticated.
-        http.SetCookie(w, &http.Cookie{
-            Name:  "session_token",
-            Value: "authenticated", // Mark user as authenticated.
-            Path:  "/",
-        })
-
-        // Redirect to the home view after successful sign-up.
-        http.Redirect(w, r, "/view/home", http.StatusFound)
-    }
+		http.Redirect(w, r, "/view/home", http.StatusFound)
+	}
 }
 
 // SignInHandler handles user sign-in.
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "GET" {
-        // Render the sign-in page for GET requests.
-        t, _ := template.ParseFiles("signin.html")
-        t.Execute(w, nil)
-    } else if r.Method == "POST" {
-        // Handle form submission for user sign-in.
-        username := r.FormValue("username") // Get the username from the form.
-        password := r.FormValue("password") // Get the password from the form.
+	if r.Method == "GET" {
+		t, _ := template.ParseFiles("signin.html")
+		t.Execute(w, nil)
+	} else if r.Method == "POST" {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
 
-        // Open the user credentials file to verify the user's credentials.
-        file, err := os.Open(userFile)
-        if err != nil {
-            http.Error(w, "Failed to open user credentials file.", http.StatusInternalServerError) // Handle file open error.
-            return
-        }
-        defer file.Close() // Ensure the file is closed when the function exits.
+		var user User
+		if err := db.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
+			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+			return
+		}
 
-        scanner := bufio.NewScanner(file) // Create a scanner to read the file line by line.
-        var authenticated bool // Flag to track if the user is authenticated.
+		http.SetCookie(w, &http.Cookie{
+			Name:  "session_token",
+			Value: "authenticated",
+			Path:  "/",
+		})
 
-        // Check each line for matching username and password.
-        for scanner.Scan() {
-            line := scanner.Text() // Get the current line.
-            parts := strings.SplitN(line, ":", 2) // Split the line into username and password.
-            if len(parts) == 2 {
-                storedUsername := parts[0]
-                storedPassword := parts[1]
-
-                // Check if the stored username and password match the input.
-                if storedUsername == username && storedPassword == password {
-                    authenticated = true // Set authenticated flag if credentials match.
-                    break
-                }
-            }
-        }
-
-        if err := scanner.Err(); err != nil {
-            http.Error(w, "Error reading user credentials.", http.StatusInternalServerError) // Handle scanning error.
-            return
-        }
-
-        if authenticated {
-            // Set a session cookie to mark the user as authenticated.
-            http.SetCookie(w, &http.Cookie{
-                Name:  "session_token",
-                Value: "authenticated", // Mark user as authenticated.
-                Path:  "/",
-            })
-            // Redirect to the home view upon successful sign-in.
-            http.Redirect(w, r, "/view/home", http.StatusFound)
-        } else {
-            http.Error(w, "Invalid username or password", http.StatusUnauthorized) // Inform user of invalid credentials.
-        }
-    }
+		http.Redirect(w, r, "/view/home", http.StatusFound)
+	}
 }
 
 // SignOutHandler handles user sign-out by clearing the session cookie.
 func SignOutHandler(w http.ResponseWriter, r *http.Request) {
-    // Invalidate the session cookie by setting its MaxAge to -1, which deletes it.
-    http.SetCookie(w, &http.Cookie{
-        Name:   "session_token",
-        Value:  "", // Clear the value.
-        Path:   "/",
-        MaxAge: -1, // Deletes the cookie.
-    })
+	http.SetCookie(w, &http.Cookie{
+		Name:   "session_token",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	})
 
-    // Redirect to the sign-in page or home page after logging out.
-    http.Redirect(w, r, "/signin", http.StatusFound)
+	http.Redirect(w, r, "/signin", http.StatusFound)
+}
+
+// HomeHandler is an example of a protected route that requires authentication.
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("home.html")
+	t.Execute(w, nil)
+}
+
+// main function to start the server and initialize the database.
+func main() {
+	InitializeDB()
+	defer db.Close()
+
+	// Define routes.
+	http.HandleFunc("/signup", SignUpHandler)
+	http.HandleFunc("/", SignInHandler)
+	http.HandleFunc("/signout", SignOutHandler)
+
+	// Example of a protected route.
+	http.HandleFunc("/view/", authMiddleware(ViewHandler))
+	http.HandleFunc("/edit/", authMiddleware(EditHandler))
+	http.HandleFunc("/save/", authMiddleware(SaveHandler))
+
+	log.Println("Server started at :8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
