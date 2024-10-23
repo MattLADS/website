@@ -1,20 +1,22 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 )
 
 func main() {
-	// Handle routes
-	http.HandleFunc("/signin", signInHandler)
-	http.HandleFunc("/profile", profileHandler)
-	http.HandleFunc("/signoff", signOffHandler)
+	InitializeDB()
+	defer db.Close()
 
-	// Serve static files
-	http.Handle("/templates/", http.StripPrefix("/templates/", http.FileServer(http.Dir("templates"))))
+	// define routes
+	http.HandleFunc("/signup", SignUpHandler)
+	http.HandleFunc("/signin", SignInHandler)
+	http.HandleFunc("/signout", SignOutHandler)
 
-	// Start server
-	fmt.Println("Server started at :8080")
-	http.ListenAndServe(":8080", nil)
+	// profile stuff from my branch, using Kunj's authMiddleware method
+	http.HandleFunc("/profile", authMiddleware(profileHandler))
+
+	log.Println("Server started at :8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
