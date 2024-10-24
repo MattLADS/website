@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"fmt"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -39,7 +41,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		cookie, err := r.Cookie("session_token")
 
 		if err != nil || cookie.Value != "authenticated" {
-			http.Redirect(w, r, "/signin", http.StatusFound) // Redirect to sign-in if not authenticated.
+			http.Redirect(w, r, "/", http.StatusFound) // Redirect to sign-in if not authenticated.
 			return
 		}
 
@@ -70,13 +72,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.SetCookie(w, &http.Cookie{
-			Name:  "session_token",
-			Value: "authenticated",
-			Path:  "/",
-		})
-
-		http.Redirect(w, r, "/view/home", http.StatusFound)
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
@@ -95,13 +91,31 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Create session if valid
+		sessionID := fmt.Sprintf("%d", time.Now().UnixNano())
+
 		http.SetCookie(w, &http.Cookie{
 			Name:  "session_token",
 			Value: "authenticated",
 			Path:  "/",
 		})
 
-		http.Redirect(w, r, "/view/home", http.StatusFound)
+		// Set a cookie with session ID
+		http.SetCookie(w, &http.Cookie{
+			Name:    "session_id",
+			Value:   sessionID,
+			Expires: time.Now().Add(24 * time.Hour),
+			Path:    "/",
+		})
+
+		http.SetCookie(w, &http.Cookie{
+			Name:	"username",
+			Value:	username,
+			Expires: time.Now().Add(24 * time.Hour),
+			Path:	"/",
+		})
+
+		http.Redirect(w, r, "/view/", http.StatusFound)
 	}
 }
 
@@ -113,12 +127,18 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 		Path:   "/",
 		MaxAge: -1,
 	})
+		// Set a cookie with session ID
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_id",
+		Value:   "",
+		Path:    "/",
+	})
 
-	http.Redirect(w, r, "/signin", http.StatusFound)
-}
+	http.SetCookie(w, &http.Cookie{
+		Name:	"username",
+		Value:	"",
+		Path:	"/",
+	})
 
-// HomeHandler is an example of a protected route that requires authentication.
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("home.html")
-	t.Execute(w, nil)
+	http.Redirect(w, r, "/", http.StatusFound)
 }

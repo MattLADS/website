@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}}</title>
+    <title>{{.Username}}: {{.Title}}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -68,13 +68,13 @@
 </head>
 <body>
     <header>
-        <h1>{{.Title}}</h1>
+        <h1>{{.Username}}: {{.Title}}</h1>
     </header>
     <div class="container">
         <p>{{.Content}}</p>
     <div class="new-comment">
         <!-- Form to post a new topic -->
-        <form method="POST" action="/new-comment">
+        <form method="POST" action="/new-comment/">
         	<input type="hidden" name="title" value={{.Title}} />
             <textarea name="comment" placeholder="Write your comment here..." rows="3" required></textarea>
             <button type="submit">Comment</button>

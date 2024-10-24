@@ -76,7 +76,7 @@
     <h1>Post a New Topic</h1>
     <div class="new-topic">
         <!-- Form to post a new topic -->
-        <form method="POST" action="/new-topic">
+        <form method="POST" action="/new-topic/">
             <input type="text" name="title" placeholder="Topic Title" required>
             <textarea name="content" placeholder="Write your post here..." rows="5" required></textarea>
             <button type="submit">Post</button>
@@ -85,7 +85,7 @@
     <h2>Recent Topics</h2>
     <ul class="topic-list">
         {{range .}}
-        <li><a href="/topic?title={{.Title}}">{{.Title}}</a></li>
+        <li><a href="/topic?title={{.Title}}">{{.Username}}: {{.Title}}</a></li>
         {{else}}
         <li>No topics available</li>
         {{end}}

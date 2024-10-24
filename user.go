@@ -2,17 +2,23 @@ package main
 
 import (
 	"net/http"
+	"log"
+	"html/template"
 )
 
 // profile handler
 func profileHandler(w http.ResponseWriter, r *http.Request) {
-	// using Kunj's session check method
-	cookie, err := r.Cookie("session_token")
-	if err != nil || cookie.Value != "authenticated" {
-		http.Redirect(w, r, "/signin", http.StatusFound)
-		return
+	// render profile page with user's info
+	tmpl, err := template.ParseFiles("profile.html")
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	// render profile page with user's info
-	http.ServeFile(w, r, "templates/profile.html")
+	cookie, err := r.Cookie("username")
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	// Pass topics data to the template
+	tmpl.Execute(w, cookie)
 }

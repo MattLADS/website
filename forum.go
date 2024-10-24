@@ -12,6 +12,8 @@ type Topic struct {
 	Title string
 	Content string
 	Comments []string
+	Commenters []string
+	Username string
 }
 
 // List of topics
@@ -61,11 +63,18 @@ func NewTopicHandler(w http.ResponseWriter, r *http.Request) {
 		title := r.FormValue("title")
 		content := r.FormValue("content")
 		comments := []string{}
+		commenters := []string{}
+
+		cookie, err := r.Cookie("username")
+		if err != nil {
+			fmt.Printf("%s\n", err)
+		}
+		poster := cookie.Value
 
 		// Check if title and content are not empty
 		if title != "" && content != "" {
 			// Append the new topic to the topics list
-			topics = append(topics, Topic{Title: title, Content: content, Comments: comments})
+			topics = append(topics, Topic{Title: title, Content: content, Comments: comments, Commenters: commenters, Username: poster})
 
 			// Redirect back to the homepage
 			http.Redirect(w, r, "/forum/", http.StatusSeeOther)
@@ -85,9 +94,15 @@ func NewCommentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		cookie, err := r.Cookie("username")
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		// Get title and comment from the form
 		title := r.FormValue("title")
 		comment := r.FormValue("comment")
+		commenter := cookie.Value
 
 		// Check if title and comment are not empty
 		if title != "" && comment != "" {
@@ -95,6 +110,7 @@ func NewCommentHandler(w http.ResponseWriter, r *http.Request) {
 			for i := range topics {
 				if topics[i].Title == title {
 					topics[i].Comments = append(topics[i].Comments, comment)
+					topics[i].Commenters = append(topics[i].Commenters, commenter)
 				}
 			}
 			url := fmt.Sprintf("/topic?title=%s", title)
