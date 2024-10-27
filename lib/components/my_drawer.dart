@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:matt_lads_app/components/my_drawer_tile.dart';
 import 'package:matt_lads_app/pages/settings.dart';
+import 'package:matt_lads_app/services/auth/auth_service.dart';
 
 // Drawer widget
 
 class MyDrawer extends StatelessWidget {
-  const MyDrawer({super.key});
+  MyDrawer({super.key});
 
+  //logout auth w/firebase
+  final _auth = AuthService();
+
+  void logout() async {
+    try {
+      _auth.logout();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
   @override
   Widget build (BuildContext context) {
     return Drawer(
@@ -70,11 +81,14 @@ class MyDrawer extends StatelessWidget {
 
             },
           ), 
+
+          const Spacer(),
+          
           //logout
           MyDrawerTile(
             title: "L O G O U T",
             icon: Icons.logout,
-            onTap: () {},
+            onTap: logout,
           ), 
         ],
       )

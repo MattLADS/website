@@ -1,19 +1,47 @@
-//TIMESTAMP 33:45. COME BACK TO THIS.
 
 import 'package:flutter/material.dart';
+import 'package:matt_lads_app/components/my_loading_circle.dart';
 import 'package:matt_lads_app/components/my_text_field.dart';
 import 'package:matt_lads_app/components/my_button.dart';
+import 'package:matt_lads_app/services/auth/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final void Function()? onTap;
+
+  const LoginPage({super.key, required this.onTap});
   
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 class _LoginPageState extends State<LoginPage> {
 
+  //access firebase auth service
+  final _auth = AuthService();
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  //login method
+  void login() async {
+    //loading circle lol
+    showLoadingCircle(context);
+
+    try {
+      await _auth.loginEmailPassword(emailController.text, passwordController.text);
+      //finish loading circle
+      if (mounted) hideLoadingCircle(context);
+    } catch (e) {
+      if (mounted) hideLoadingCircle(context);
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(e.toString()),
+            )
+          );
+        }
+    }
+  }
 
   @override
   Widget build (BuildContext context) {
@@ -69,19 +97,21 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 10),
 
                 //sign in
-                MyButton(text: "Sign in", onTap: () {}),
+                MyButton(text: "Login", onTap: login,),
 
                 const SizedBox(height: 50),
 
                 // not a member? register now
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text ("Not a member?", style: TextStyle(color: Theme.of(context).colorScheme.primary),
                     ),
                     const SizedBox(width: 5),
 
                     GestureDetector(
-                      onTap: () {},
+                      //tap to go to register page
+                      onTap: widget.onTap,
                       child: Text("Register now", style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
                       ),  
                     ),
