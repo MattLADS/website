@@ -182,6 +182,24 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "cloud_firestore",
+      "rootUri": "file:///Users/suhaninarayan/.pub-cache/hosted/pub.dev/cloud_firestore-5.4.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "cloud_firestore_platform_interface",
+      "rootUri": "file:///Users/suhaninarayan/.pub-cache/hosted/pub.dev/cloud_firestore_platform_interface-6.4.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "cloud_firestore_web",
+      "rootUri": "file:///Users/suhaninarayan/.pub-cache/hosted/pub.dev/cloud_firestore_web-4.3.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "collection",
       "rootUri": "file:///Users/suhaninarayan/.pub-cache/hosted/pub.dev/collection-1.18.0",
       "packageUri": "lib/",
@@ -824,7 +842,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-10-26T23:18:54.663582Z",
+  "generated": "2024-10-28T16:07:52.169660Z",
   "generator": "pub",
   "generatorVersion": "3.5.3",
   "flutterRoot": "file:///Users/suhaninarayan/Desktop/senior%20teams/flutter",

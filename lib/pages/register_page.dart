@@ -4,6 +4,7 @@ import 'package:matt_lads_app/components/my_loading_circle.dart';
 import 'package:matt_lads_app/components/my_text_field.dart';
 import 'package:matt_lads_app/services/auth/auth_service.dart';
  
+//1:08:53, TUTORIAL TIMESTAMP
 
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
