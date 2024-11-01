@@ -4,6 +4,8 @@
 //search users
 //search posts and classes
 
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:matt_lads_app/models/user.dart';
@@ -48,7 +50,7 @@ class DatabaseService {
       DocumentSnapshot userDoc = await _db.collection("Users").doc(uid).get();
       return UserProfile.fromDocument(userDoc);
     } catch (e) {
-      print(e);
+      log(e.toString());
       return null;
     }
   }

@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class ProfilPage extends StatefulWidget {
   final String url;
 
-  ProfilPage({required this.url});
+  const ProfilPage({super.key, required this.url});
 
   @override
-  _ProfilPageState createState() => _ProfilPageState();
+  ProfilPageState createState() => ProfilPageState();
 }
 
-class _ProfilPageState extends State<ProfilPage> {
+class ProfilPageState extends State<ProfilPage> {
   int _selectedItemIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -17,8 +17,8 @@ class _ProfilPageState extends State<ProfilPage> {
       body: Column(
         children: [
           Container(
-            margin: EdgeInsets.only(top: 35),
-            padding: EdgeInsets.symmetric(horizontal: 15),
+            margin: const EdgeInsets.only(top: 35),
+            padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -26,15 +26,15 @@ class _ProfilPageState extends State<ProfilPage> {
                     onTap: () {
                       Navigator.of(context).pop();
                     },
-                    child: Icon(Icons.arrow_back_ios)),
-                Icon(Icons.more_vert),
+                    child: const Icon(Icons.arrow_back_ios)),
+                const Icon(Icons.more_vert),
               ],
             ),
           ),
           Hero(
             tag: widget.url,
                       child: Container(
-              margin: EdgeInsets.only(top: 35),
+              margin: const EdgeInsets.only(top: 35),
               height: 80,
               width: 80,
               decoration: BoxDecoration(
@@ -54,10 +54,10 @@ class _ProfilPageState extends State<ProfilPage> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Text(
+          const Text(
             "Tom Smith",
             style: TextStyle(
               fontSize: 18,
@@ -71,7 +71,7 @@ class _ProfilPageState extends State<ProfilPage> {
               color: Colors.grey[400],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Row(
@@ -83,13 +83,13 @@ class _ProfilPageState extends State<ProfilPage> {
           ),
           Expanded(
             child: Container(
-              margin: EdgeInsets.only(left: 8, right: 8, top: 8),
+              margin: const EdgeInsets.only(left: 8, right: 8, top: 8),
               decoration: BoxDecoration(
                   color: Colors.grey.withOpacity(0.15),
                   borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(25))),
+                      const BorderRadius.vertical(top: Radius.circular(25))),
               child: GridView.count(
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
                 crossAxisCount: 2,
                 crossAxisSpacing: 5,
                 mainAxisSpacing: 5,
@@ -108,16 +108,16 @@ class _ProfilPageState extends State<ProfilPage> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
+      floatingActionButton: SizedBox(
         height: 60,
         child: FittedBox(
           child: FloatingActionButton(
             onPressed: () {},
-            child: Icon(
-              Icons.add,
-            ),
             backgroundColor: Colors.grey[900],
             elevation: 15,
+            child: const Icon(
+              Icons.add,
+            ),
           ),
         ),
       ),
@@ -151,18 +151,16 @@ class _ProfilPageState extends State<ProfilPage> {
           _selectedItemIndex = index;
         });
       },
-      child: Container(
+      child: SizedBox(
         width: MediaQuery.of(context).size.width / 5,
         height: 45,
-        child: icon != null
-            ? Icon(
-                icon,
-                size: 25,
-                color: index == _selectedItemIndex
-                    ? Colors.black
-                    : Colors.grey[700],
-              )
-            : Container(),
+        child: Icon(
+          icon,
+          size: 25,
+          color: index == _selectedItemIndex
+              ? Colors.black
+              : Colors.grey[700],
+        ),
       ),
     );
   }
@@ -187,7 +185,7 @@ class _ProfilPageState extends State<ProfilPage> {
       children: [
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
