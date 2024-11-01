@@ -1,14 +1,28 @@
-2024/10/26-20:17:16.687 a103 Reusing MANIFEST /private/var/folders/jb/2wh1b5_n75j7yptzz6531t2r0000gn/T/flutter_tools.glm4Qh/flutter_tools_chrome_device.UVx6s6/Default/shared_proto_db/MANIFEST-000001
-2024/10/26-20:17:16.687 a103 Recovering log #23
-2024/10/26-20:17:16.688 a103 Reusing old log /private/var/folders/jb/2wh1b5_n75j7yptzz6531t2r0000gn/T/flutter_tools.glm4Qh/flutter_tools_chrome_device.UVx6s6/Default/shared_proto_db/000023.log 
-2024/10/26-20:17:16.688 a103 Delete type=0 #13
-2024/10/26-20:17:16.689 a103 Delete type=0 #7
-2024/10/26-20:17:16.689 a103 Delete type=0 #4
-2024/10/26-20:17:16.689 a103 Delete type=0 #10
-2024/10/26-20:17:16.689 a103 Delete type=0 #16
-2024/10/26-20:17:16.689 a103 Delete type=0 #3
-2024/10/26-20:17:16.689 a103 Delete type=2 #14
-2024/10/26-20:17:16.689 a103 Delete type=2 #17
-2024/10/26-20:17:16.689 a103 Delete type=2 #11
-2024/10/26-20:17:16.689 a103 Delete type=2 #8
-2024/10/26-20:17:16.689 a103 Delete type=0 #19
+2024/10/31-14:57:03.994 8403 Reusing MANIFEST /private/var/folders/cq/zw2nkhbd0bg32f9b3qb5_d5c0000gp/T/flutter_tools.V8Y854/flutter_tools_chrome_device.ibxzFk/Default/shared_proto_db/MANIFEST-000001
+2024/10/31-14:57:03.995 8403 Recovering log #29
+2024/10/31-14:57:04.001 8403 Reusing old log /private/var/folders/cq/zw2nkhbd0bg32f9b3qb5_d5c0000gp/T/flutter_tools.V8Y854/flutter_tools_chrome_device.ibxzFk/Default/shared_proto_db/000029.log 
+2024/10/31-14:57:04.004 8403 Delete type=0 #13
+2024/10/31-14:57:04.004 8403 Delete type=0 #7
+2024/10/31-14:57:04.004 8403 Delete type=0 #4
+2024/10/31-14:57:04.004 8403 Delete type=0 #10
+2024/10/31-14:57:04.004 8403 Delete type=0 #16
+2024/10/31-14:57:04.004 8403 Delete type=0 #3
+2024/10/31-14:57:04.004 8403 Delete type=2 #14
+2024/10/31-14:57:04.004 8403 Delete type=2 #17
+2024/10/31-14:57:04.005 8403 Delete type=2 #11
+2024/10/31-14:57:04.005 8403 Delete type=2 #8
+2024/10/31-14:57:04.005 8403 Delete type=0 #26
+2024/10/31-14:57:04.005 8403 Delete type=0 #19
+2024/10/31-14:57:04.005 8403 Delete type=0 #23
+2024/10/31-14:57:19.561 8403 Level-0 table #33: started
+2024/10/31-14:57:19.662 8403 Level-0 table #33: 123055 bytes OK
+2024/10/31-14:57:19.701 8403 Delete type=0 #29
+2024/10/31-14:57:19.704 8403 Compacting 4@0 + 1@1 files
+2024/10/31-14:57:19.750 8403 Generated table #34@0: 1083 keys, 136153 bytes
+2024/10/31-14:57:19.751 8403 Compacted 4@0 + 1@1 files => 136153 bytes
+2024/10/31-14:57:19.789 8403 compacted to: files[ 0 1 1 0 0 0 0 ]
+2024/10/31-14:57:19.790 8403 Delete type=2 #21
+2024/10/31-14:57:19.791 8403 Delete type=2 #33
+2024/10/31-14:57:19.791 8403 Delete type=2 #27
+2024/10/31-14:57:19.791 8403 Delete type=2 #24
+2024/10/31-14:57:19.791 8403 Delete type=2 #30
