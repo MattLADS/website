@@ -1,6 +1,7 @@
 package main
 
 import (
+	"C"
 	"html/template"
 	"net/http"
 	"os"

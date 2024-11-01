@@ -26,7 +26,7 @@ void main() async {
 
 Future<void> startGoServer() async {
   // Adjust the path to your Go server executable
-  const goServerPath = 'main.go';
+  const goServerPath = './website.go';
   final process = await Process.start(goServerPath, []);
   process.stdout.transform(utf8.decoder).listen((data) {
     log(data);

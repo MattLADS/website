@@ -1,4 +1,4 @@
-module main.go
+module website.go
 
 go 1.22.3
 

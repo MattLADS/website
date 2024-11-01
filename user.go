@@ -1,9 +1,10 @@
 package main
 
 import (
-	"net/http"
-	"log"
+	"C"
 	"html/template"
+	"log"
+	"net/http"
 )
 
 // profile handler
@@ -18,7 +19,7 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	// Pass topics data to the template
 	tmpl.Execute(w, cookie)
 }
