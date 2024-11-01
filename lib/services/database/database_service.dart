@@ -4,6 +4,10 @@
 //search users
 //search posts and classes
 
+//this is where I handled a lot of backend stuff with firebase. This is essentuially
+//irrelevant if you're not using firebase, so this is just a reference 
+//for now 
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:matt_lads_app/models/user.dart';
@@ -54,7 +58,6 @@ class DatabaseService {
   }
  
   //post message
-  
 
   //likes
 
