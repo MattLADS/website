@@ -1,51 +1,95 @@
-# Miscellaneous
-*.class
+# Uncomment this line if you are using the IntelliJ IDE
+# .idea/
+
+# macOS related
+macos/Flutter/ephemeral/
+macos/Pods/
+macos/.symlinks/
+macos/Flutter/Flutter.podspec
+macos/Flutter/Generated.xcconfig
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Runner.xcworkspace/
+macos/Runner/GeneratedPluginRegistrant.swift
+
+# iOS related
+ios/Flutter/.last_build_id
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/GeneratedPluginRegistrant.*
+ios/.symlinks/
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Android related
+android/.gradle/
+android/app/build/
+android/local.properties
+android/.idea/
+android/gradle/
+android/app/src/debug/
+android/app/src/profile/
+android/app/src/main/kotlin/com/example/flutter_app/MainActivity.kt
+
+# Web related
+web/.dart_tool/
+web/.packages
+web/build/
+
+# VS Code related
+# .vscode/
+.history/
+
+# Dart/Flutter related
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+
+# Other
 *.log
+*.lock
 *.pyc
 *.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-migrate_working_dir/
-macos/
-
-# IntelliJ related
+*.swo
+*.DS_Store
+.idea/
 *.iml
 *.ipr
 *.iws
-.idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-.flutter-plugins-dependencies
-.dart_tool/package_config.json
-.flutter-plugins-dependencies
-.flutter-plugins
-linux/flutter/generated_plugins.cmake
-linux/flutter/generated_plugin_registrant.cc
-.dart_tool/package_config_subset
+*.class
+*.jar
+*.war
+*.ear
+*.db
+*.sqlite
+*.sqlite3
+*.bak
+*.tmp
+*.temp
+*.orig
+*.rej
+*.sublime-workspace
+*.sublime-project
+*.sublime-settings
+*.sublime-metadata
+*.sublime-package
+*.sublime-snippet
+*.sublime-completions
+*.sublime-keymap
+*.sublime-macro
+*.sublime-menu
+*.sublime-syntax
+*.sublime-theme
+*.sublime-color-scheme
+*.sublime-build
+*.sublime-project
+*.sublime-settings
+*.sublime-workspace
+*.sublime-completions
+*.sublime-keymap
+*.sublime-macro
+*.sublime-menu
