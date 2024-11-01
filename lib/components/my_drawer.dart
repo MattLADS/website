@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:matt_lads_app/components/my_drawer_tile.dart';
 import 'package:matt_lads_app/pages/settings.dart';
@@ -15,7 +17,7 @@ class MyDrawer extends StatelessWidget {
     try {
       _auth.logout();
     } catch (e) {
-      print(e.toString());
+      log(e.toString());
     }
   }
   @override
@@ -75,7 +77,7 @@ class MyDrawer extends StatelessWidget {
               Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => Settings(),
+                builder: (context) => const Settings(),
             )
             );
 

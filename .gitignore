@@ -9,6 +9,7 @@
 .history
 .svn/
 migrate_working_dir/
+macos/
 
 # IntelliJ related
 *.iml
@@ -42,3 +43,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 .flutter-plugins-dependencies
+.dart_tool/package_config.json
+.flutter-plugins-dependencies
+.flutter-plugins
+linux/flutter/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.cc
+.dart_tool/package_config_subset

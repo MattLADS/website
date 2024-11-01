@@ -13,7 +13,7 @@ class MySettingsTile extends StatelessWidget{
         color: Theme.of(context).colorScheme.secondary,
         borderRadius: BorderRadius.circular(12),
       ),
-      margin: EdgeInsets.only(left: 25, right: 25, top: 10), 
+      margin: const EdgeInsets.only(left: 25, right: 25, top: 10), 
 
       padding: const EdgeInsets.all(25),
       
@@ -22,7 +22,7 @@ class MySettingsTile extends StatelessWidget{
         children: [
           Text(
             title,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           action,
         ],

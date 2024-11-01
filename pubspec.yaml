@@ -18,23 +18,23 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.5.2
+  sdk: ^3.0.0
 
 dependencies:
   flutter:
     sdk: flutter
 
-  flutter_bloc:
-  flutter_lints: ^5.0.0
-  amplify_flutter:
-  amplify_api:
-  amplify_datastore:
-  amplify_auth_cognito:
-  amplify_storage_s3:
-  process_run: ^1.2.2
+  flutter_bloc: ^8.0.0
+  flutter_lints: ^2.0.0
+  amplify_flutter: ^0.3.0
+  amplify_api: ^0.3.0
+  amplify_datastore: ^0.3.0
+  amplify_auth_cognito: ^0.3.0
+  amplify_storage_s3: ^0.3.0
+  process_run: ^0.12.0
 
-  image_picker:
-  cached_network_image:
+  image_picker: ^0.8.4+4
+  cached_network_image: ^3.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
