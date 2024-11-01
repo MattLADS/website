@@ -5,6 +5,9 @@
 //search posts and classes
 
 import 'dart:developer';
+//this is where I handled a lot of backend stuff with firebase. This is essentuially
+//irrelevant if you're not using firebase, so this is just a reference 
+//for now 
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -56,7 +59,6 @@ class DatabaseService {
   }
  
   //post message
-  
 
   //likes
 
