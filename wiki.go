@@ -97,17 +97,19 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 }
 
 func main() {
-	// Load existing user credentials from the database at startup.
-	InitializeDB()
-	defer db.Close()
+	InitializeForumDB()
+	defer func() {
+		// Close the forum database connection
+		if sqlDB, err := forumDB.DB(); err == nil {
+			sqlDB.Close()
+		}
+	}()
 
-	// Set up HTTP handlers for different routes.
+	// Set up HTTP handlers.
 	http.HandleFunc("/signup", SignUpHandler)
 	http.HandleFunc("/", SignInHandler)
 	http.HandleFunc("/signout", SignOutHandler)
-
 	http.HandleFunc("/forum/", authMiddleware(ForumHandler))
-
 	http.HandleFunc("/topic", authMiddleware(TopicHandler))
 	http.HandleFunc("/new-topic", authMiddleware(NewTopicHandler))
 	http.HandleFunc("/new-comment", authMiddleware(NewCommentHandler))
@@ -115,7 +117,6 @@ func main() {
 	http.HandleFunc("/edit/", authMiddleware(EditHandler))
 	http.HandleFunc("/save/", authMiddleware(SaveHandler))
 
-	// Start the HTTP server on port 8080.
 	log.Println("Starting server on :8085")
 	err := http.ListenAndServe(":8085", nil)
 	if err != nil {
