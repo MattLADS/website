@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"fmt"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -78,12 +78,16 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 // SignInHandler handles user sign-in.
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("SignInHandler called")
+	log.Printf("Request method: %s", r.Method)
+
 	if r.Method == "GET" {
 		t, _ := template.ParseFiles("signin.html")
 		t.Execute(w, nil)
 	} else if r.Method == "POST" {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
+		log.Printf("Received username: %s, password: %s", username, password)
 
 		var user User
 		if err := db.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
@@ -93,6 +97,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Create session if valid
 		sessionID := fmt.Sprintf("%d", time.Now().UnixNano())
+		log.Println("Login successful, setting session token")
 
 		http.SetCookie(w, &http.Cookie{
 			Name:  "session_token",
@@ -109,10 +114,10 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		})
 
 		http.SetCookie(w, &http.Cookie{
-			Name:	"username",
-			Value:	username,
+			Name:    "username",
+			Value:   username,
 			Expires: time.Now().Add(24 * time.Hour),
-			Path:	"/",
+			Path:    "/",
 		})
 
 		http.Redirect(w, r, "/view/", http.StatusFound)
@@ -127,17 +132,17 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 		Path:   "/",
 		MaxAge: -1,
 	})
-		// Set a cookie with session ID
+	// Set a cookie with session ID
 	http.SetCookie(w, &http.Cookie{
-		Name:    "session_id",
-		Value:   "",
-		Path:    "/",
+		Name:  "session_id",
+		Value: "",
+		Path:  "/",
 	})
 
 	http.SetCookie(w, &http.Cookie{
-		Name:	"username",
-		Value:	"",
-		Path:	"/",
+		Name:  "username",
+		Value: "",
+		Path:  "/",
 	})
 
 	http.Redirect(w, r, "/", http.StatusFound)

@@ -1,18 +1,27 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"fmt"
+
+	"github.com/jinzhu/gorm"
 )
 
 // Data structure for topics
 type Topic struct {
-	Title string
-	Content string
-	Comments []string
-	Commenters []string
+	gorm.Model
+	Title    string
+	Content  string
+	Username string
+	Comments []Comment `gorm:"foreignKey:TopicID"`
+}
+
+type Comment struct {
+	gorm.Model
+	TopicID  uint
+	Content  string
 	Username string
 }
 
@@ -62,8 +71,7 @@ func NewTopicHandler(w http.ResponseWriter, r *http.Request) {
 		// Get title and content from the form
 		title := r.FormValue("title")
 		content := r.FormValue("content")
-		comments := []string{}
-		commenters := []string{}
+		comments := []Comment{}
 
 		cookie, err := r.Cookie("username")
 		if err != nil {
@@ -74,7 +82,7 @@ func NewTopicHandler(w http.ResponseWriter, r *http.Request) {
 		// Check if title and content are not empty
 		if title != "" && content != "" {
 			// Append the new topic to the topics list
-			topics = append(topics, Topic{Title: title, Content: content, Comments: comments, Commenters: commenters, Username: poster})
+			topics = append(topics, Topic{Title: title, Content: content, Username: poster, Comments: comments})
 
 			// Redirect back to the homepage
 			http.Redirect(w, r, "/forum/", http.StatusSeeOther)
@@ -109,8 +117,7 @@ func NewCommentHandler(w http.ResponseWriter, r *http.Request) {
 			// Append the new comment to the comments list
 			for i := range topics {
 				if topics[i].Title == title {
-					topics[i].Comments = append(topics[i].Comments, comment)
-					topics[i].Commenters = append(topics[i].Commenters, commenter)
+					topics[i].Comments = append(topics[i].Comments, Comment{TopicID: topics[i].ID, Content: comment, Username: commenter})
 				}
 			}
 			url := fmt.Sprintf("/topic?title=%s", title)
