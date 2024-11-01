@@ -1,12 +1,12 @@
 package main
 
+import "C"
+
 import (
-	"C"
 	"log"
 	"net/http"
 )
 
-// to help connect front/back end
 func enableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*") // Allow all origins for now

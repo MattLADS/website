@@ -1,7 +1,8 @@
 package main
 
+import "C"
+
 import (
-	"C"
 	"fmt"
 	"html/template"
 	"log"

@@ -19,7 +19,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Start the Go server
-  await startGoServer();
+  startGoServer();
 
   runApp(
     ChangeNotifierProvider(
@@ -29,11 +29,10 @@ void main() async {
   );
 }
 
-Future<void> startGoServer() async {
-  final lib = DynamicLibrary.open('${Directory(Platform.resolvedExecutable).parent.path}/Frameworks/goServer.so');
-
+void startGoServer() async {
+  final lib = DynamicLibrary.open('${Directory(Platform.resolvedExecutable).parent.path}/../Resources/goServer.so');
   final goServerFunc goServer =
-      lib.lookupFunction<Void Function(), goServerFunc>('goServer');
+      lib.lookup<NativeFunction<goServerType>>("goServer").asFunction();
   goServer();
 }
 

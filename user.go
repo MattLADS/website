@@ -1,7 +1,7 @@
 package main
 
+import "C"
 import (
-	"C"
 	"html/template"
 	"log"
 	"net/http"
