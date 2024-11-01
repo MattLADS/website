@@ -374,6 +374,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "flutter_lints",
+      "rootUri": "file:///Users/duncanbirdsall/.pub-cache/hosted/pub.dev/flutter_lints-2.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "flutter_plugin_android_lifecycle",
       "rootUri": "file:///Users/duncanbirdsall/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.23",
       "packageUri": "lib/",
@@ -498,6 +504,12 @@
       "rootUri": "file:///Users/duncanbirdsall/.pub-cache/hosted/pub.dev/leak_tracker_testing-3.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "lints",
+      "rootUri": "file:///Users/duncanbirdsall/.pub-cache/hosted/pub.dev/lints-2.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "logging",
@@ -842,7 +854,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-11-01T00:53:03.495026Z",
+  "generated": "2024-11-01T04:19:33.132798Z",
   "generator": "pub",
   "generatorVersion": "3.5.3",
   "flutterRoot": "file:///Users/duncanbirdsall/CS490/flutter",
