@@ -8,6 +8,7 @@ import 'package:process_run/process_run.dart';
 import 'dart:io';
 import 'dart:developer';
 import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,8 +27,8 @@ void main() async {
 
 Future<void> startGoServer() async {
   // Adjust the path to your Go server executable
-  const goServerPath = './website.go';
-  final process = await Process.start(goServerPath, []);
+  final goServerPath = Uri.file('/lib/goServer').toFilePath();
+  final process = await Process.start('.$goServerPath', []);
   process.stdout.transform(utf8.decoder).listen((data) {
     log(data);
   });
