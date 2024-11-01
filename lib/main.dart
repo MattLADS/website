@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:matt_lads_app/firebase_options.dart';
@@ -8,8 +9,11 @@ import 'package:process_run/process_run.dart';
 import 'dart:io';
 import 'dart:developer';
 import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
+import 'dart:isolate';
 
+  
+typedef goServerType = Void Function();
+typedef goServerFunc = void Function();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -26,15 +30,11 @@ void main() async {
 }
 
 Future<void> startGoServer() async {
-  // Adjust the path to your Go server executable
-  final goServerPath = Uri.file('/lib/goServer').toFilePath();
-  final process = await Process.start('.$goServerPath', []);
-  process.stdout.transform(utf8.decoder).listen((data) {
-    log(data);
-  });
-  process.stderr.transform(utf8.decoder).listen((data) {
-    log('Error: $data');
-  });
+  final lib = DynamicLibrary.open('${Directory(Platform.resolvedExecutable).parent.path}/Frameworks/goServer.so');
+
+  final goServerFunc goServer =
+      lib.lookupFunction<Void Function(), goServerFunc>('goServer');
+  goServer();
 }
 
 class PostApp extends StatelessWidget {

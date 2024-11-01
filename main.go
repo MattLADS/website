@@ -21,7 +21,9 @@ func enableCORS(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-func main() {
+
+//export goServer
+func goServer() {
 	// Load existing user credentials from the database at startup.
 	InitializeForumDB()
 	defer func() {
@@ -51,3 +53,5 @@ func main() {
 		log.Fatalf("Error starting server: %v", err)
 	}
 }
+
+func main() {}
