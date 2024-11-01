@@ -4,53 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In</title>
-    <style>
-        body {
-            background-color: #228B22; /* Forest Green */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh; /* Full height of the viewport */
-            margin: 0;
-            color: white; /* Text color */
-        }
-        h1 {
-            font-size: 3em;
-            margin-bottom: 20px; /* Space below the title */
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        label {
-            font-size: 1.2em; /* Increase label font size */
-            margin-bottom: 5px; /* Space below labels */
-        }
-        input {
-            padding: 10px;
-            margin-bottom: 15px; /* Space between input fields */
-            font-size: 1em; /* Input font size */
-            width: 200px; /* Input width */
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 1em; /* Button font size */
-            cursor: pointer; /* Pointer cursor on hover */
-        }
-    </style>
 </head>
 <body>
-    <h1>MATTLADS</h1>
-    <form action="/signin" method="post">
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" required>
-        
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required>
-        
-        <button type="submit">Sign In</button>
+    <h1>Sign In</h1>
+    <form action="/signin/" method="post">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="Sign In">
     </form>
 </body>
 </html>

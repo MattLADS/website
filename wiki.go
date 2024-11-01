@@ -2,7 +2,6 @@ package main
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 )
@@ -93,33 +92,5 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 	if err != nil {
 		// Return an error if rendering the template fails.
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func main() {
-	InitializeForumDB()
-	defer func() {
-		// Close the forum database connection
-		if sqlDB, err := forumDB.DB(); err == nil {
-			sqlDB.Close()
-		}
-	}()
-
-	// Set up HTTP handlers.
-	http.HandleFunc("/signup", SignUpHandler)
-	http.HandleFunc("/", SignInHandler)
-	http.HandleFunc("/signout", SignOutHandler)
-	http.HandleFunc("/forum/", authMiddleware(ForumHandler))
-	http.HandleFunc("/topic", authMiddleware(TopicHandler))
-	http.HandleFunc("/new-topic", authMiddleware(NewTopicHandler))
-	http.HandleFunc("/new-comment", authMiddleware(NewCommentHandler))
-	http.HandleFunc("/view/", authMiddleware(ViewHandler))
-	http.HandleFunc("/edit/", authMiddleware(EditHandler))
-	http.HandleFunc("/save/", authMiddleware(SaveHandler))
-
-	log.Println("Starting server on :8085")
-	err := http.ListenAndServe(":8085", nil)
-	if err != nil {
-		log.Fatalf("Error starting server: %v", err)
 	}
 }

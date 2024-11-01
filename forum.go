@@ -90,10 +90,16 @@ func NewTopicHandler(w http.ResponseWriter, r *http.Request) {
 
 		title := r.FormValue("title")
 		content := r.FormValue("content")
-		username := r.FormValue("username")
+    comments := []Comment{}
+
+		cookie, err := r.Cookie("username")
+		if err != nil {
+			fmt.Printf("%s\n", err)
+		}
+		username := cookie.Value
 
 		if title != "" && content != "" && username != "" {
-			newTopic := Topic{Title: title, Content: content, Username: username}
+      newTopic := Topic{Title: title, Content: content, Username: username, Comments: comments}
 			forumDB.Create(&newTopic)
 
 			http.Redirect(w, r, "/forum/", http.StatusSeeOther)
@@ -111,12 +117,17 @@ func NewCommentHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Unable to parse form", http.StatusBadRequest)
 			return
 		}
-
+    
 		title := r.FormValue("title")
-		commentContent := r.FormValue("comment")
-		username := r.FormValue("username")
-
-		if title != "" && commentContent != "" && username != "" {
+		comment := r.FormValue("comment")
+    
+		cookie, err := r.Cookie("username")
+		if err != nil {
+			log.Fatal(err)
+		}
+		username := cookie.Value
+    
+		if title != "" && comment != "" && username != "" {
 			// Find the topic by title in forumDB
 			var topic Topic
 			err := forumDB.Where("title = ?", title).First(&topic).Error
@@ -124,7 +135,6 @@ func NewCommentHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Topic not found", http.StatusNotFound)
 				return
 			}
-
 			// Create and save the new comment associated with the topic's ID
 			newComment := Comment{TopicID: topic.ID, Content: commentContent, Username: username}
 			forumDB.Create(&newComment)
