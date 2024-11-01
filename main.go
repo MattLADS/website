@@ -1,6 +1,7 @@
 package main
 
 import (
+	"C"
 	"log"
 	"net/http"
 )
@@ -35,9 +36,6 @@ func main() {
 	http.Handle("/", enableCORS(http.HandlerFunc(SignInHandler)))
 	http.Handle("/signout/", enableCORS(http.HandlerFunc(SignOutHandler)))
 	http.Handle("/forum/", enableCORS(authMiddleware(http.HandlerFunc(ForumHandler))))
-
-	// profile stuff from Abi's branch, using Kunj's authMiddleware method
-	//added logic to enable CORS - for front/backend merging
 	http.Handle("/profile/", enableCORS(authMiddleware(http.HandlerFunc(profileHandler))))
 	http.Handle("/topic/", enableCORS(authMiddleware(http.HandlerFunc(TopicHandler))))
 	http.Handle("/new-topic/", enableCORS(authMiddleware(http.HandlerFunc(NewTopicHandler))))
@@ -47,8 +45,8 @@ func main() {
 	http.Handle("/save/", enableCORS(authMiddleware(http.HandlerFunc(SaveHandler))))
 
 	// Start the HTTP server on port 8080.
-	log.Println("Starting server on :8090")
-	err := http.ListenAndServe(":8090", nil)
+	log.Println("Starting server on :8080")
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}

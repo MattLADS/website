@@ -1,9 +1,8 @@
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class BackendAuthService {
-  static const String baseUrl = 'http://localhost:8090';
+  static const String baseUrl = 'http://localhost:8080';
 
   // Register with backend
   Future<void> register(String username, String password) async {

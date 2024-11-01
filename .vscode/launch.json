@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "website-1",
+            "name": "website",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "website-1 (profile mode)",
+            "name": "website (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "website-1 (release mode)",
+            "name": "website (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

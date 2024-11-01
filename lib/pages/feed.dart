@@ -26,18 +26,18 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: MyDrawer(),
       appBar: AppBar(
-        title: Text("H O M E"),
+        title: const Text("H O M E"),
         foregroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _topicsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error loading topics'));
+            return const Center(child: Text('Error loading topics'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No topics available'));
+            return const Center(child: Text('No topics available'));
           } else {
             List<Map<String, dynamic>> topics = snapshot.data!;
             return ListView.builder(

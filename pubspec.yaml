@@ -25,12 +25,13 @@ dependencies:
     sdk: flutter
 
   flutter_bloc:
-  flutter_lints: ^2.0.0
+  flutter_lints: ^5.0.0
   amplify_flutter:
   amplify_api:
   amplify_datastore:
   amplify_auth_cognito:
   amplify_storage_s3:
+  process_run: ^1.2.2
 
   image_picker:
   cached_network_image:
@@ -42,6 +43,7 @@ dependencies:
   firebase_core: ^3.6.0
   firebase_auth: ^5.3.1
   cloud_firestore: ^5.4.4
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:
