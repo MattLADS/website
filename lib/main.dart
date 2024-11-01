@@ -1,19 +1,14 @@
-import 'dart:ffi';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:matt_lads_app/firebase_options.dart';
 import 'package:matt_lads_app/services/auth/auth_gate.dart';
 import 'package:provider/provider.dart';
 import 'package:matt_lads_app/themes/theme_provider.dart';
-import 'package:process_run/process_run.dart';
-import 'dart:io';
-import 'dart:developer';
-import 'dart:convert';
-import 'dart:isolate';
 
-  
-typedef goServerType = Void Function();
-typedef goServerFunc = void Function();
+// Conditional imports
+import 'package:matt_lads_app/go_server_stub.dart'
+    if (dart.library.ffi) 'package:matt_lads_app/go_server_macos.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -27,13 +22,6 @@ void main() async {
       child: const PostApp(),
     ),
   );
-}
-
-void startGoServer() async {
-  final lib = DynamicLibrary.open('${Directory(Platform.resolvedExecutable).parent.path}/../Resources/goServer.so');
-  final goServerFunc goServer =
-      lib.lookup<NativeFunction<goServerType>>("goServer").asFunction();
-  goServer();
 }
 
 class PostApp extends StatelessWidget {
