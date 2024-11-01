@@ -22,8 +22,13 @@ func enableCORS(next http.Handler) http.Handler {
 }
 func main() {
 	// Load existing user credentials from the database at startup.
-	InitializeDB()
-	defer db.Close()
+	InitializeForumDB()
+	defer func() {
+		// Close the forum database connection
+		if sqlDB, err := forumDB.DB(); err == nil {
+			sqlDB.Close()
+		}
+	}()
 
 	// Set up HTTP handlers for different routes (EDIT: enabling CORS).
 	http.Handle("/signup/", enableCORS(http.HandlerFunc(SignUpHandler)))
