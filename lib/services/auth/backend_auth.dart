@@ -12,6 +12,7 @@ class BackendAuthService {
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'username': username, 'password': password}),
     );
+    //THIS IS A GOOD REFERENCE HTTP REQUEST 
 
     if (response.statusCode == 200 || response.statusCode == 302) {
       //Navigator.pushNamed(context, '/login');
