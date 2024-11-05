@@ -1,6 +1,6 @@
 package main
 
-import "C"
+// import "C"
 
 import (
 	"log"
@@ -54,4 +54,6 @@ func goServer() {
 	}
 }
 
-func main() {}
+func main() {
+	goServer()
+}
