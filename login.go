@@ -32,7 +32,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		t, _ := template.ParseFiles("signup.html")
+		t, _ := template.ParseFiles("login_or_register.dart")
 		t.Execute(w, nil)
 	} else if r.Method == "POST" {
 		username := r.FormValue("username")
@@ -60,7 +60,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Request method: %s", r.Method)
 
 	if r.Method == "GET" {
-		t, _ := template.ParseFiles("signin.html")
+		t, _ := template.ParseFiles("login_or_register.dart")
 		t.Execute(w, nil)
 	} else if r.Method == "POST" {
 		username := r.FormValue("username")

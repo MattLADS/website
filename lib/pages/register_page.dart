@@ -36,7 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
       showLoadingCircle(context);
 
       try {
-        await _auth.registerEmailPassword(emailController.text, passwordController.text);
+        await _auth.register(emailController.text, passwordController.text);
         //finish loading circle
         if (mounted) hideLoadingCircle(context);
       } catch (e) {

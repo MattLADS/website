@@ -1,49 +1,54 @@
-//authentication in firebase. temporary contigency until merge. login, register, logout, delete account
-
-import 'package:firebase_auth/firebase_auth.dart';
+//authentication with backend. login, register, logout, delete account
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AuthService {
+  static const String baseUrl = 'http://localhost:8080';
 
-  //get instance of auth
-  final _auth = FirebaseAuth.instance;
+  // Login with backend
+  Future<void> login(String username, String password) async {
+    final url = Uri.parse('$baseUrl/login');
+    final form = <String, dynamic>{};
+    form['username'] = username;
+    form['password'] = password;
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'multipart/form-data'},
+      body: form,
+    );
 
-  //get current user and uid
-  User? getCurrentUser() => _auth.currentUser;
-  String getCurrentUid()  => _auth.currentUser!.uid;
-
-  //login with email and password
-  Future<UserCredential> loginEmailPassword(String email, String password) async {
-    try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: email, 
-        password: password
-      );
-      return userCredential;
-
-    } on FirebaseAuthException catch (e){
-      throw Exception(e.code);
-       
+    if (response.statusCode == 200) {
+      // Successful login
+    } else if (response.statusCode == 401) {
+      throw Exception('Invalid username or password');
+    } else {
+      throw Exception('Failed to login user');
     }
   }
-  //register with email and password
-  Future<UserCredential> registerEmailPassword(String email, String password) async {
-    try {
 
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email, 
-        password: password
-      );
-      return userCredential;
+  // Register with backend
+  Future<void> register(String username, String password) async {
+    final url = Uri.parse('$baseUrl/signup');
+    final form = <String, dynamic>{};
+    form['username'] = username;
+    form['password'] = password;
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'multipart/form-data'},
+      body: form,
+    );
 
-    } on FirebaseAuthException catch (e){
-      throw Exception(e.code);
-       
+    if (response.statusCode == 200 || response.statusCode == 302) {
+      // Successful registration
+    } else if (response.statusCode == 409) {
+      throw Exception('Username already exists');
+    } else {
+      throw Exception('Failed to register user');
     }
   }
-  //logout
+
+  // Logout (if needed)
   Future<void> logout() async {
-    await _auth.signOut();
+    // Implement logout functionality if needed
   }
-
-
 }

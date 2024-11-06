@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
     showLoadingCircle(context);
 
     try {
-      await _auth.loginEmailPassword(emailController.text, passwordController.text);
+      await _auth.login(emailController.text, passwordController.text);
       //finish loading circle
       if (mounted) hideLoadingCircle(context);
     } catch (e) {
