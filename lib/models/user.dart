@@ -2,7 +2,6 @@
 //every user has this, to check their own profile?
 //uid, name, email, classes in (like OS and senior teams in the listed)
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserProfile {
   final String uid;
@@ -19,22 +18,19 @@ class UserProfile {
     required this.classes
   });
 
-  //app to firebase
-  //converting firestore document to user profile
-
-  factory UserProfile.fromDocument(DocumentSnapshot doc) {
+  //takes backend data and formats it in JSON
+  factory UserProfile.fromJSON(Map<String, dynamic> json) {
     return UserProfile(
-       uid: doc['uid'],
-       name: doc['name'],
-       email: doc['email'],
-       username: doc['username'],
-       classes: doc['classes'].cast<String>(),
+       uid: json['uid'],
+       name: json['name'],
+       email: json['email'],
+       username: json['username'],
+       classes: json['classes'].cast<String>(),
     );
   }
-  //firebase to app
-  //convert user profile to a map for storage
 
-  Map<String, dynamic> toMap() {
+  //convert user profile to JSON for storage
+  Map<String, dynamic> toJson() {
     return {
       'uid': uid,
       'name': name,

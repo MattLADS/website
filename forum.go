@@ -2,8 +2,8 @@ package main
 
 //import "C"
 import (
+	"encoding/json"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 
@@ -47,21 +47,35 @@ func InitializeForumDB() {
 
 // ForumHandler serves the forum page with a list of topics.
 func ForumHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("forum.html")
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Println("ForumHandler called")
+	log.Printf("Request method: %s", r.Method)
+	// Set response header to JSON
+	w.Header().Set("Content-Type", "application/json")
 
 	var topics []Topic
 	// Retrieve topics from the database
-	forumDB.Preload("Comments").Find(&topics)
+	if err := forumDB.Preload("Comments").Find(&topics).Error; err != nil {
+		log.Printf("Error fetching topics: %v", err)
+		http.Error(w, "Error fetching topics", http.StatusInternalServerError)
+		return
+	}
 
-	// Pass topics data to the template
-	tmpl.Execute(w, topics)
+	log.Printf("Number of topics retrieved: %d", len(topics)) // Log the count
+
+	if len(topics) == 0 {
+		log.Println("No topics found, returning an empty array.")
+	}
+
+	// Encode topics to JSON and send as response
+	if err := json.NewEncoder(w).Encode(topics); err != nil {
+		http.Error(w, "Error encoding topics to JSON", http.StatusInternalServerError)
+	}
+
 }
 
 // TopicHandler serves a specific topic page along with its comments.
 func TopicHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	title := r.URL.Query().Get("title")
 
 	// Retrieve the topic by title from forumDB
@@ -72,42 +86,73 @@ func TopicHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Render the topic page with the retrieved topic and its comments
-	tmpl, err := template.ParseFiles("topic.html")
-	if err != nil {
-		log.Fatal(err)
+	// Convert topic to JSON and send response
+	if err := json.NewEncoder(w).Encode(topic); err != nil {
+		http.Error(w, `{"error": "Failed to encode topic"}`, http.StatusInternalServerError)
 	}
-	tmpl.Execute(w, topic)
 }
 
 // NewTopicHandler adds a new topic to the database.
 func NewTopicHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		err := r.ParseForm()
-		if err != nil {
-			http.Error(w, "Unable to parse form", http.StatusBadRequest)
-			return
-		}
+	log.Println("NewTopicHandler called")
+	log.Printf("Request method: %s", r.Method)
 
-		title := r.FormValue("title")
-		content := r.FormValue("content")
-		comments := []Comment{}
-
-		cookie, err := r.Cookie("username")
-		if err != nil {
-			fmt.Printf("%s\n", err)
-		}
-		username := cookie.Value
-
-		if title != "" && content != "" && username != "" {
-			newTopic := Topic{Title: title, Content: content, Username: username, Comments: comments}
-			forumDB.Create(&newTopic)
-
-			http.Redirect(w, r, "/forum/", http.StatusSeeOther)
-		} else {
-			http.Error(w, "Title, content, and username are required", http.StatusBadRequest)
-		}
+	//checking that request is POST
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST requests are allowed", http.StatusMethodNotAllowed)
+		return
 	}
+
+	log.Println("Parsing JSON body...")
+
+	// Decode the JSON body
+	var parseJSON struct {
+		Title   string `json:"title"`
+		Content string `json:"content"`
+	}
+	log.Println("JSON decoded successfully")
+
+	if err := json.NewDecoder(r.Body).Decode(&parseJSON); err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	// Get title and content from the request
+	title := parseJSON.Title
+	content := parseJSON.Content
+
+	// Get username from the cookie
+	cookie, err := r.Cookie("username")
+	if err != nil {
+		log.Println("Failed to retrieve username cookie:", err)
+		http.Error(w, "User not authenticated", http.StatusUnauthorized)
+		return
+	}
+	username := cookie.Value
+
+	log.Printf("NewTopicHandler called with title: %s, content: %s, username: %s", parseJSON.Title, parseJSON.Content, username)
+
+	// Check if title, content, and username are valid
+	if title == "" || content == "" || username == "" {
+		http.Error(w, "Title, content, and username are required", http.StatusBadRequest)
+		return
+	}
+
+	// Create and save the new topic
+	newTopic := Topic{Title: title, Content: content, Username: username}
+	log.Printf("Creating topic with Title: %s, Content: %s, Username: %s", title, content, username)
+	if err := forumDB.Create(&newTopic).Error; err != nil {
+		log.Printf("Error saving topic to database: %v", err)
+		http.Error(w, "Failed to create topic", http.StatusInternalServerError)
+		return
+	}
+	log.Println("Topic saved to database successfully")
+
+	// Send a success response
+	log.Println("Topic created successfully, sending response")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(`{"message": "Topic created successfully"}`))
 }
 
 // NewCommentHandler adds a new comment to a topic.
