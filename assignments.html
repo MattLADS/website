@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assignments</title>
+</head>
+<body>
+    <h1>Assignments</h1>
+
+    <!-- Form for uploading assignments -->
+    <form method="POST" action="/upload-assignment/" enctype="multipart/form-data">
+        <label for="title">Title:</label>
+        <input type="text" name="title" id="title" placeholder="Assignment Title" required>
+        <br><br>
+        <label for="description">Description:</label>
+        <textarea name="description" id="description" placeholder="Write a description" required></textarea>
+        <br><br>
+        <label for="file">Choose File:</label>
+        <input type="file" name="file" id="file" required>
+        <br><br>
+        <button type="submit">Upload Assignment</button>
+    </form>
+
+    <hr>
+
+    <!-- Display uploaded assignments -->
+    <h2>Uploaded Assignments</h2>
+    <ul>
+        {{range .}}
+        <li>
+            <strong>{{.Title}}</strong> - {{.Description}} (Uploaded by: {{.Username}}) <br>
+            <a href="{{.FilePath}}" download>Download</a> |
+            <a href="/edit-assignment/?id={{.ID}}">Edit</a> |
+            <a href="/delete-assignment/?id={{.ID}}">Delete</a>
+        </li>
+        {{else}}
+        <li>No assignments have been uploaded yet.</li>
+        {{end}}
+    </ul>
+</body>
+</html>
