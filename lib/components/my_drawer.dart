@@ -72,6 +72,18 @@ class MyDrawer extends StatelessWidget {
             icon: Icons.person,
             onTap: () {}, 
           ), 
+
+
+          // chatbot
+          MyDrawerTile(
+            title: "C H A T B O T",
+            icon: Icons.chat,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/chatbot');
+            },
+          ),
+          
           //search list
           MyDrawerTile(
             title: "S E A R C H",
