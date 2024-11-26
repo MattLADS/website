@@ -135,8 +135,8 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			Expires:  time.Now().Add(24 * time.Hour),
 			Path:     "/",
 			HttpOnly: true,
-			SameSite: http.SameSiteNoneMode,
-			Secure:   false,
+			//SameSite: http.SameSiteNoneMode,
+			//Secure:   false,
 		})
 		log.Printf("Set-Cookie header for username: %s", request.Username)
 

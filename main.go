@@ -13,13 +13,14 @@ func enableCORS(next http.Handler) http.Handler {
 		log.Println("Request Origin:", origin)
 
 		// Allow any localhost origin
-		if origin == "http://localhost:8080" || (len(origin) > 16 && origin[:17] == "http://localhost:") {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-		}
+		//if origin == "http://localhost:8080" || (len(origin) > 16 && origin[:17] == "http://localhost:") {
+		//	w.Header().Set("Access-Control-Allow-Origin", origin)
+		//}
 		//w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8080")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Origin", origin)
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
@@ -40,13 +41,6 @@ func goServer() {
 			sqlDB.Close()
 		}
 	}()
-	/*
-		//testing forum handler
-		http.Handle("/forum/", enableCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			log.Println("Received request on /forum/")
-			ForumHandler(w, r)
-		})))
-	*/
 
 	// Set up HTTP handlers for different routes (EDIT: enabling CORS).
 	http.Handle("/signup/", enableCORS(http.HandlerFunc(SignUpHandler)))
@@ -62,7 +56,7 @@ func goServer() {
 	http.Handle("/save/", enableCORS(authMiddleware(http.HandlerFunc(SaveHandler))))
 	http.Handle("/auth/status", enableCORS(http.HandlerFunc(AuthStatusHandler)))
 	http.HandleFunc("/logout/", SignOutHandler)
-	log.Println("Registered /forum/ route")
+	//log.Println("Registered /forum/ route")
 	http.Handle("/forum/", enableCORS(http.HandlerFunc(ForumHandler)))
 	http.Handle("/new-topic/", enableCORS(http.HandlerFunc(NewTopicHandler)))
 

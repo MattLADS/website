@@ -7,17 +7,20 @@ import (
 	"log"
 	"net/http"
 
+	"time"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 // Topic represents a forum topic with related comments.
 type Topic struct {
-	gorm.Model
-	Title    string
-	Username string
-	Content  string
-	Comments []Comment `gorm:"foreignKey:TopicID"`
+	ID        uint      `json:"id"`
+	Title     string    `json:"Title"`
+	Username  string    `json:"Username"`
+	Content   string    `json:"Content"`
+	CreatedAt time.Time `json:"Created_at"`
+	//Comments []Comment `gorm:"foreignKey:TopicID"`
 }
 
 // Comment represents a comment on a forum topic.
@@ -49,12 +52,13 @@ func InitializeForumDB() {
 func ForumHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("ForumHandler called")
 	log.Printf("Request method: %s", r.Method)
+
 	// Set response header to JSON
 	w.Header().Set("Content-Type", "application/json")
 
 	var topics []Topic
-	// Retrieve topics from the database
-	if err := forumDB.Preload("Comments").Find(&topics).Error; err != nil {
+	// Retrieve topics from the database in descending order
+	if err := forumDB.Order("Created_at DESC").Find(&topics).Error; err != nil {
 		log.Printf("Error fetching topics: %v", err)
 		http.Error(w, "Error fetching topics", http.StatusInternalServerError)
 		return
@@ -64,6 +68,13 @@ func ForumHandler(w http.ResponseWriter, r *http.Request) {
 
 	if len(topics) == 0 {
 		log.Println("No topics found, returning an empty array.")
+		json.NewEncoder(w).Encode([]Topic{}) // Return an empty array
+		return
+	}
+
+	// Debugging: Log each topic
+	for _, topic := range topics {
+		log.Printf("Topic: Title=%s, Content=%s, Username=%s", topic.Title, topic.Content, topic.Username)
 	}
 
 	// Encode topics to JSON and send as response
@@ -107,30 +118,24 @@ func NewTopicHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Decode the JSON body
 	var parseJSON struct {
-		Title   string `json:"title"`
-		Content string `json:"content"`
+		Title    string `json:"Title"`
+		Content  string `json:"Content"`
+		Username string `json:"Username"`
 	}
-	log.Println("JSON decoded successfully")
 
 	if err := json.NewDecoder(r.Body).Decode(&parseJSON); err != nil {
+		log.Println("Failed to parse JSON body")
 		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
 		return
 	}
+	log.Println("JSON decoded successfully")
 
 	// Get title and content from the request
 	title := parseJSON.Title
 	content := parseJSON.Content
+	username := parseJSON.Username
 
-	// Get username from the cookie
-	cookie, err := r.Cookie("username")
-	if err != nil {
-		log.Println("Failed to retrieve username cookie:", err)
-		http.Error(w, "User not authenticated", http.StatusUnauthorized)
-		return
-	}
-	username := cookie.Value
-
-	log.Printf("NewTopicHandler called with title: %s, content: %s, username: %s", parseJSON.Title, parseJSON.Content, username)
+	log.Printf("NewTopicHandler called with title: %s, content: %s, username: %s", title, content, username)
 
 	// Check if title, content, and username are valid
 	if title == "" || content == "" || username == "" {

@@ -16,12 +16,10 @@ class ForumService {
     
     final url = Uri.parse('$baseUrl/forum/');
     log("Attempting to fetch topics from: $url");  // Log start of fetch
-      
-    final response = await http.get(
-      url,
-      headers: {'Content-Type': 'application/json',},
-    );
 
+    final client = http.BrowserClient();
+      
+    final response = await client.get(url);
 
     log('Response status: ${response.statusCode}');
     log('Response body: ${response.body}');
@@ -36,27 +34,31 @@ class ForumService {
   }
 
   Future<void> postTopic(String title, String content) async {
-    
     log('postTopic called with Title: $title, Content: $content');
     final url = Uri.parse('$baseUrl/new-topic/');
-    log('POST URL: $url');
 
-    final client = http.BrowserClient(); // Use BrowserClient
+    // Initialize SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final username = prefs.getString('username') ?? '';
 
+    final client = http.BrowserClient();
     final response = await client.post(
       url,
       headers: {
         'Content-Type': 'application/json',
       },
-      body: json.encode({'title': title, 'content': content}),
+      body: json.encode({
+        'title': title, 
+        'content': content,
+        'username': username,
+      }),
     );
-    log('POST request to $url with body: ${json.encode({'title': title, 'content': content})}');
+
     log('Response status: ${response.statusCode}');
     log('Response body: ${response.body}');
 
     if (response.statusCode == 201) {
       log('Post submitted successfully');
-      return; // Success case
     } else {
       log('Failed to post topic. Status: ${response.statusCode}, Body: ${response.body}');
       throw Exception('Failed to post topic');
