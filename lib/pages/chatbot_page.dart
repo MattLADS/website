@@ -9,7 +9,6 @@ class ChatbotPage extends StatefulWidget {
   @override
   State<ChatbotPage> createState() => _ChatbotPageState();
 }
-
 class _ChatbotPageState extends State<ChatbotPage> {
   final TextEditingController _messageController = TextEditingController();
   final ChatbotService _chatbotService = ChatbotService();
