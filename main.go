@@ -64,6 +64,11 @@ func goServer() {
 	//http.HandleFunc("/testtopics", enableCORS(http.HandlerFunc(TestTopicsHandler)))
 	//http.Handle("/testtopics", enableCORS(http.HandlerFunc(TestTopicsHandler)))
 
+	// New routes for assignments
+	http.Handle("/upload-assignment/", enableCORS(authMiddleware(http.HandlerFunc(UploadAssignmentHandler))))
+	http.Handle("/assignments/", enableCORS(authMiddleware(http.HandlerFunc(ListAssignmentsHandler))))
+	http.Handle("/delete-assignment/", enableCORS(authMiddleware(http.HandlerFunc(DeleteAssignmentHandler))))
+
 	// Start the HTTP server on port 8080.
 	log.Println("Starting server on :8080")
 	err := http.ListenAndServe(":8080", nil)

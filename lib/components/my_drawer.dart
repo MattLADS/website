@@ -86,6 +86,28 @@ class MyDrawer extends StatelessWidget {
               );
             },
           ), 
+
+
+          // chatbot
+          MyDrawerTile(
+            title: "C H A T B O T",
+            icon: Icons.chat,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/chatbot');
+            },
+          ),
+          
+          // assignments
+          MyDrawerTile(
+            title: "A S S I G N M E N T S",
+            icon: Icons.assignment,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/assignments');
+            },
+          ),
+
           //search list
           MyDrawerTile(
             title: "S E A R C H",

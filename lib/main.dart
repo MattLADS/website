@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:matt_lads_app/pages/chatbot_page.dart';
+import 'package:matt_lads_app/pages/assignments_page.dart';
 import 'package:matt_lads_app/pages/login_page.dart';
 import 'package:matt_lads_app/services/auth/auth_gate.dart';
 import 'package:provider/provider.dart';
@@ -12,16 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 
 
-// Conditional imports
-// import 'package:matt_lads_app/go_server_stub.dart'
- //   if (dart.library.ffi) 'package:matt_lads_app/go_server_macos.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
- 
-  // Start the Go server
-  //startGoServer();
-
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
@@ -68,6 +62,10 @@ class PostApp extends StatelessWidget {
           },
         ),
         '/settings': (context) => const Settings(),
+        '/chatbot': (context) => const ChatbotPage(),
+        '/assignments': (context) => const AssignmentsPage(),
+
+
       },
     );
   }
