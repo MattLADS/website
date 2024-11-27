@@ -35,8 +35,6 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("SignUpHandler called")
 	if r.Method == "POST" {
 		var request User
-		//username := r.FormValue("username")
-		//password := r.FormValue("password")
 
 		// Decode JSON body
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -57,7 +55,16 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(`{"error": "Username already exists. Please choose another one."}`))
 			return
 		}
+		// Set username cookie for the session
+		http.SetCookie(w, &http.Cookie{
+			Name:    "username",
+			Value:   request.Username,
+			Path:    "/",
+			Expires: time.Now().Add(24 * time.Hour), // Setting cookie expiration to 24hrs - we can change later.
+		})
+		log.Printf("Set-Cookie header for username: %s", request.Username)
 
+		//create new user
 		newUser := User{Username: request.Username, Password: request.Password}
 		if err := forumDB.Create(&newUser).Error; err != nil {
 			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
@@ -140,7 +147,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		log.Printf("Set-Cookie header for username: %s", request.Username)
 
-		log.Println("SignUpHandler: Sending response")
+		log.Println("SignInHandler: Sending response")
 		//changed redirect to send information in JSON format
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

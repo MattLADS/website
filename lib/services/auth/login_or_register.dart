@@ -60,6 +60,9 @@ class LoginOrRegister extends StatefulWidget {
     try {
       bool success = await authService.register(username, password);
       if (success) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('username', username);
+        log('Username saved after registration: $username');
         Navigator.of(context).pushReplacementNamed('/forum/');
       }
     } catch (e) {

@@ -43,7 +43,17 @@ class PostApp extends StatelessWidget {
         '/':(context) => AuthGate(),
         //'/forum': (context) => const HomePage(), 
         '/forum/': (context) => const HomePage(),
-        '/profile': (context) => ProfilePage(url: ModalRoute.of(context)?.settings.arguments as String),
+        '/profile': (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+          return ProfilePage(
+            url: args?['url'] ?? 'https://via.placeholder.com/150', // Default or passed profile picture URL
+            username: args?['username'] ?? 'DefaultUser', // Default or passed username
+            email: args?['email'] ?? 'No email provided', // Default or passed email
+            classes: args?['classes'] ?? [], // Default or passed list of classes
+          );
+        },
+        
         '/register': (context) => RegisterPage(
           onRegister: (username, password) async {
             try {
