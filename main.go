@@ -47,7 +47,8 @@ func goServer() {
 			ForumHandler(w, r)
 		})))
 	*/
-
+	// Register the chatbot handler
+	http.HandleFunc("/chatbot", ChatbotHandler)
 	// Set up HTTP handlers for different routes (EDIT: enabling CORS).
 	http.Handle("/signup/", enableCORS(http.HandlerFunc(SignUpHandler)))
 	http.Handle("/", enableCORS(http.HandlerFunc(SignInHandler)))

@@ -120,9 +120,9 @@ func NewTopicHandler(w http.ResponseWriter, r *http.Request) {
 	// Get title and content from the request
 	title := parseJSON.Title
 	content := parseJSON.Content
-
 	// Get username from the cookie
 	cookie, err := r.Cookie("username")
+	log.Print("Cookie: ", cookie)
 	if err != nil {
 		log.Println("Failed to retrieve username cookie:", err)
 		http.Error(w, "User not authenticated", http.StatusUnauthorized)

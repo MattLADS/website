@@ -5,13 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/browser_client.dart';
 import 'package:http/browser_client.dart' as http;
 
-final client = BrowserClient()..withCredentials = true;
-
 
 class ForumService {
   static const String baseUrl = 'http://localhost:8080';
 
   Future<List<Map<String, dynamic>>> fetchTopics() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final cookies = prefs.getString('username');
     log("fetchTopics called");
     
     final url = Uri.parse('$baseUrl/forum/');
@@ -19,7 +19,7 @@ class ForumService {
       
     final response = await http.get(
       url,
-      headers: {'Content-Type': 'application/json',},
+      headers: {'Content-Type': 'application/json', 'Cookie': 'username=$cookies'},
     );
 
 
@@ -36,20 +36,21 @@ class ForumService {
   }
 
   Future<void> postTopic(String title, String content) async {
-    
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final cookies = prefs.getString('username');
     log('postTopic called with Title: $title, Content: $content');
     final url = Uri.parse('$baseUrl/new-topic/');
     log('POST URL: $url');
 
-    final client = http.BrowserClient(); // Use BrowserClient
-
-    final response = await client.post(
+    final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
+        'Cookie': 'username=$cookies',
       },
       body: json.encode({'title': title, 'content': content}),
     );
+    log('Cookie sent as username=$cookies');
     log('POST request to $url with body: ${json.encode({'title': title, 'content': content})}');
     log('Response status: ${response.statusCode}');
     log('Response body: ${response.body}');
@@ -64,10 +65,12 @@ class ForumService {
   }
 
   Future<void> postComment(String title, String comment) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final cookies = prefs.getString('username');
     final url = Uri.parse('$baseUrl/new-comment/');
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/json', 'Cookie': 'username=$cookies'},
       body: json.encode({'title': title, 'comment': comment}),
     );
 
