@@ -84,6 +84,16 @@ class MyDrawer extends StatelessWidget {
             },
           ),
           
+          // assignments
+          MyDrawerTile(
+            title: "A S S I G N M E N T S",
+            icon: Icons.assignment,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/assignments');
+            },
+          ),
+
           //search list
           MyDrawerTile(
             title: "S E A R C H",
