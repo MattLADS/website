@@ -14,16 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 
 
-// Conditional imports
-// import 'package:matt_lads_app/go_server_stub.dart'
- //   if (dart.library.ffi) 'package:matt_lads_app/go_server_macos.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
- 
-  // Start the Go server
-  //startGoServer();
-
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
