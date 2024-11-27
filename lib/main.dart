@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:matt_lads_app/pages/chatbot_page.dart';
+import 'package:matt_lads_app/pages/assignments_page.dart';
+import 'package:matt_lads_app/pages/login_page.dart';
 import 'package:matt_lads_app/services/auth/auth_gate.dart';
 import 'package:provider/provider.dart';
 import 'package:matt_lads_app/themes/theme_provider.dart';
+import 'package:matt_lads_app/pages/feed.dart';
+import 'package:matt_lads_app/pages/profile.dart';
+import 'package:matt_lads_app/pages/register_page.dart';
+import 'package:matt_lads_app/pages/settings.dart';
+import 'package:matt_lads_app/services/auth/backend_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,10 +29,34 @@ class PostApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = BackendAuthService();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const AuthGate(),
       theme: Provider.of<ThemeProvider>(context).themeData,
+      routes: {
+        '/':(context) => AuthGate(),
+        //'/forum': (context) => const HomePage(), 
+        '/forum/': (context) => const HomePage(),
+        '/profile': (context) => ProfilePage(url: ModalRoute.of(context)?.settings.arguments as String),
+        '/register': (context) => RegisterPage(
+          onRegister: (username, password) async {
+            try {
+              await authService.register(username, password);
+              Navigator.of(context).pushReplacementNamed('/forum/');
+            } catch (e) {
+              print(e); // Handle error (e.g., show a dialog)
+            }
+          },
+          onLogin: () {
+            Navigator.of(context).pushReplacementNamed('/login');
+          },
+        ),
+        '/settings': (context) => const Settings(),
+        '/chatbot': (context) => const ChatbotPage(),
+        '/assignments': (context) => const AssignmentsPage(),
+
+
+      },
     );
   }
 }

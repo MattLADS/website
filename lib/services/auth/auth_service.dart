@@ -1,6 +1,5 @@
 //authentication with backend. login, register, logout, delete account
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class AuthService {
   static const String baseUrl = 'http://localhost:8080';
