@@ -41,10 +41,13 @@ func goServer() {
 	http.Handle("/profile/", enableCORS(authMiddleware(http.HandlerFunc(profileHandler))))
 	http.Handle("/topic/", enableCORS(authMiddleware(http.HandlerFunc(TopicHandler))))
 	http.Handle("/new-topic/", enableCORS(authMiddleware(http.HandlerFunc(NewTopicHandler))))
-	http.Handle("/new-comment/", enableCORS(authMiddleware(http.HandlerFunc(NewCommentHandler))))
-	http.Handle("/view/", enableCORS(authMiddleware(http.HandlerFunc(ViewHandler))))
+	http.Handle("/new-commsent/", enableCORS(authMiddleware(http.HandlerFunc(NewCommentHandler))))
+	//http.Handle("/view/", enableCORS(authMiddleware(http.HandlerFunc(ViewHandler))))
+	http.Handle("/view/", enableCORS(authMiddleware(http.HandlerFunc(ProfileHandler))))
 	http.Handle("/edit/", enableCORS(authMiddleware(http.HandlerFunc(EditHandler))))
 	http.Handle("/save/", enableCORS(authMiddleware(http.HandlerFunc(SaveHandler))))
+	http.Handle("/edit-profile/", enableCORS(authMiddleware(http.HandlerFunc(EditProfileHandler))))
+	http.Handle("/update-profile/", enableCORS(authMiddleware(http.HandlerFunc(UpdateProfileHandler))))
 
 	// New routes for assignments
 	http.Handle("/upload-assignment/", enableCORS(authMiddleware(http.HandlerFunc(UploadAssignmentHandler))))
