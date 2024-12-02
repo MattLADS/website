@@ -1,11 +1,11 @@
 package main
 
 //import "C"
+//
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
+	"html/template"
 	"net/http"
 	"time"
 )
@@ -13,8 +13,9 @@ import (
 // User represents a user with a unique ID, username, and password.
 type User struct {
 	ID       uint   `gorm:"primaryKey"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `gorm:"unique"`
+	Email    string `gorm:"unique"`
+	Password string
 }
 
 // authMiddleware checks if the user is authenticated.
@@ -31,123 +32,75 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		t, _ := template.ParseFiles("login_or_register.dart")
+		t.Execute(w, nil)
+	} else if r.Method == "POST" {
+		username := r.FormValue("username")
+		email := r.FormValue("email")
+		password := r.FormValue("password")
 
-	log.Println("SignUpHandler called")
-	if r.Method == "POST" {
-		var request User
-
-		// Decode JSON body
-		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			http.Error(w, `{"error": "Invalid JSON format"}`, http.StatusBadRequest)
-			return
-		}
-		// Log received username and password for verification
-		log.Printf("Received login request - Username: %s, Password: %s\n", request.Username, request.Password)
-
-		//checking user info in database
 		var existingUser User
-		if err := forumDB.Where("username = ?", request.Username).First(&existingUser).Error; err == nil {
-			//http.Error(w, "Username already exists. Please choose another one.", http.StatusConflict)
-			// Send JSON response
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusConflict)
-			w.Write([]byte(`{"error": "Username already exists. Please choose another one."}`))
+		if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
+			http.Error(w, "Username or email already exists. Please choose another one.", http.StatusConflict)
 			return
 		}
-		// Set username cookie for the session
-		http.SetCookie(w, &http.Cookie{
-			Name:    "username",
-			Value:   request.Username,
-			Path:    "/",
-			Expires: time.Now().Add(24 * time.Hour), // Setting cookie expiration to 24hrs - we can change later.
-		})
-		log.Printf("Set-Cookie header for username: %s", request.Username)
 
-		//create new user
-		newUser := User{Username: request.Username, Password: request.Password}
+		newUser := User{Username: username, Email: email, Password: password}
 		if err := forumDB.Create(&newUser).Error; err != nil {
 			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
 			return
 		}
-		//changed redirect to send information in JSON format
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"message": " Created user successfully"}`))
+
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
 // SignInHandler handles user sign-in.
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("SignInHandler called")
-	log.Printf("Request method: %s", r.Method)
+	if r.Method == "GET" {
+		t, _ := template.ParseFiles("login_or_register.dart")
+		t.Execute(w, nil)
+	} else if r.Method == "POST" {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
 
-	if r.Method == "POST" {
-		var request struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
-		}
-
-		// Decode JSON body
-		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-			log.Println("Error decoding JSON:", err)
-			w.Header().Set("Content-Type", "application/json")
-			http.Error(w, `{"error": "Invalid JSON format"}`, http.StatusBadRequest)
-			return
-		}
-
-		log.Printf("Received username: %s, password: %s", request.Username, request.Password)
-
-		//checking user info in database
 		var user User
-		if err := forumDB.Where("username = ? AND password = ?", request.Username, request.Password).First(&user).Error; err != nil {
-			log.Println("Invalid username or password")
-			// Send JSON response for invalid credentials
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusUnauthorized)
-			//w.Write([]byte(`{"error": "Invalid username and password. Try again."}`))
-			json.NewEncoder(w).Encode(map[string]string{"error": "Invalid username and password. Try again."})
-
+		if err := forumDB.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
+			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 			return
-
 		}
 
-		// Create session if valid
 		sessionID := fmt.Sprintf("%d", time.Now().UnixNano())
-		log.Println("Login successful, setting session token")
 
 		http.SetCookie(w, &http.Cookie{
 			Name:  "session_token",
 			Value: "authenticated",
 			Path:  "/",
-			//SameSite: http.SameSiteNoneMode, // Allow cross-origin requests
 		})
 
-		// Set a cookie with session ID
 		http.SetCookie(w, &http.Cookie{
 			Name:    "session_id",
 			Value:   sessionID,
 			Expires: time.Now().Add(24 * time.Hour),
 			Path:    "/",
-			//SameSite: http.SameSiteNoneMode,
 		})
 
 		http.SetCookie(w, &http.Cookie{
-			Name:     "username",
-			Value:    request.Username,
-			Expires:  time.Now().Add(24 * time.Hour),
-			Path:     "/",
-			HttpOnly: true,
-			//SameSite: http.SameSiteNoneMode,
-			//Secure:   false,
+			Name:    "username",
+			Value:   user.Username,
+			Expires: time.Now().Add(24 * time.Hour),
+			Path:    "/",
 		})
-		log.Printf("Set-Cookie header for username: %s", request.Username)
 
-		log.Println("SignInHandler: Sending response")
-		//changed redirect to send information in JSON format
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Login was successful"}`))
+		http.SetCookie(w, &http.Cookie{
+			Name:    "email",
+			Value:   user.Email,
+			Expires: time.Now().Add(24 * time.Hour),
+			Path:    "/",
+		})
+
+		http.Redirect(w, r, "/view/", http.StatusFound)
 	}
 }
 
@@ -172,25 +125,116 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 		Path:  "/",
 	})
 
-	//changed redirect to send information in JSON format
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "Sign out was successful"}`))
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-// AuthStatusHandler checks if the user is logged in by verifying the session token.
-func AuthStatusHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("AuthStatusHandler called")
+// ProfileHandler handles user profile.
+func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+	usernameCookie, err1 := r.Cookie("username")
+	emailCookie, err2 := r.Cookie("email")
 
-	// Check if session_token cookie exists and is set to "authenticated"
-	cookie, err := r.Cookie("session_token")
-	if err != nil || cookie.Value != "authenticated" {
-		// If no valid session, return 401 Unauthorized
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if err1 != nil || err2 != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
 
-	// If valid session, return 200 OK
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "Session is active"}`))
+	data := struct {
+		Username string
+		Email    string
+	}{
+		Username: usernameCookie.Value,
+		Email:    emailCookie.Value,
+	}
+
+	t, _ := template.ParseFiles("profile.html")
+	t.Execute(w, data)
+}
+
+// EditProfileHandler renders the edit profile page.
+func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
+	usernameCookie, err1 := r.Cookie("username")
+	emailCookie, err2 := r.Cookie("email")
+
+	if err1 != nil || err2 != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	data := struct {
+		Username string
+		Email    string
+	}{
+		Username: usernameCookie.Value,
+		Email:    emailCookie.Value,
+	}
+
+	t, err := template.ParseFiles("edit_profile.html")
+	if err != nil {
+		http.Error(w, "Error loading edit profile page", http.StatusInternalServerError)
+		return
+	}
+
+	t.Execute(w, data)
+
+}
+
+// UpdateProfileHandler updates user profile.
+func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	usernameCookie, err1 := r.Cookie("username")
+	emailCookie, err2 := r.Cookie("email")
+
+	if err1 != nil || err2 != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	currentUsername := usernameCookie.Value
+	currentEmail := emailCookie.Value
+
+	newUsername := r.FormValue("username")
+	newEmail := r.FormValue("email")
+
+	var user User
+	if err := forumDB.Where("username = ? AND email = ?", currentUsername, currentEmail).First(&user).Error; err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	// Check if the new username or email already exists
+	var existingUser User
+	if err := forumDB.Where("username = ? OR email = ?", newUsername, newEmail).First(&existingUser).Error; err == nil && existingUser.ID != user.ID {
+		http.Error(w, "Username or email already in use. Please choose another.", http.StatusConflict)
+		return
+	}
+
+	// Update user information
+	user.Username = newUsername
+	user.Email = newEmail
+
+	if err := forumDB.Save(&user).Error; err != nil {
+		http.Error(w, "Failed to update profile", http.StatusInternalServerError)
+		return
+	}
+
+	// Update cookies with new username and email
+	http.SetCookie(w, &http.Cookie{
+		Name:    "username",
+		Value:   newUsername,
+		Expires: time.Now().Add(24 * time.Hour),
+		Path:    "/",
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "email",
+		Value:   newEmail,
+		Expires: time.Now().Add(24 * time.Hour),
+		Path:    "/",
+	})
+
+	http.Redirect(w, r, "/view/", http.StatusFound)
 }
