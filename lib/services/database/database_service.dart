@@ -4,22 +4,20 @@
 //search users
 //search posts and classes
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer';
+import 'dart:convert';
 import 'package:matt_lads_app/models/user.dart';
+import 'package:http/http.dart' as http;
 
 class DatabaseService {
-  //get instance of firestore database & auth
-  final _db = FirebaseFirestore.instance;
-  final _auth = FirebaseAuth.instance;
+
+  final String baseUrl = 'http://localhost:8080'; //backend URL
 
   //user profile, when a new user registers create an account and store details
   //n the database to display on their profile
 
   //save user info
   Future<void> saveUserInfoInFirebase({required String name, email}) async {
-    //get user id
-    String uid = _auth.currentUser!.uid;
 
     //extract username from email
     String username = email.split('@')[0];
@@ -27,28 +25,39 @@ class DatabaseService {
 
     //create user profile
     UserProfile user = UserProfile(
-      uid: uid,
+      uid: '', //this will be assigned in the backend
       name: name,
       email: email,
       username: username,
       classes: [],
     );
+    //convert data to JSON and send to backend
+    final response = await http.post(
+      Uri.parse('$baseUrl/signup'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(user.toJson()),
+    );
 
-    //convert user into map for firebase db storage 
-    final userMap = user.toMap();
-
-    //save user info in firebase
-    await _db.collection("Users").doc(uid).set(userMap);
+    if (response.statusCode != 201) {
+      throw Exception('Failed to save user info');
+    }
   }
 
-  //get user info
-  Future<UserProfile?> getUserInfoFromFirebase(String uid) async {
+  //get user info from backend
+  Future<UserProfile?> getUserInfo(String uid) async {
 
     try {
-      DocumentSnapshot userDoc = await _db.collection("Users").doc(uid).get();
-      return UserProfile.fromDocument(userDoc);
+      final response = await http.get(Uri.parse('$baseUrl/users/$uid'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return UserProfile.fromJSON(data);
+      } else {
+        log('Failed to load user info: ${response.reasonPhrase}');
+        return null;
+      }
+
     } catch (e) {
-      print(e);
+      log('Error getting user info: $e');
       return null;
     }
   }

@@ -1,7 +1,9 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:matt_lads_app/components/my_drawer_tile.dart';
+import 'package:matt_lads_app/pages/profile.dart';
 import 'package:matt_lads_app/pages/settings.dart';
-import 'package:matt_lads_app/services/auth/auth_service.dart';
+import 'package:http/http.dart' as http;
 
 // Drawer widget
 
@@ -9,13 +11,25 @@ class MyDrawer extends StatelessWidget {
   MyDrawer({super.key});
 
   //logout auth w/firebase
-  final _auth = AuthService();
+  //final _auth = AuthService();
 
-  void logout() async {
+  void logout(BuildContext context) async {
     try {
-      _auth.logout();
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/logout'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        log("Logged out successfully");
+        
+        // Navigate back to the login page after logout
+        Navigator.of(context).pushReplacementNamed('/login'); 
+      } else {
+        log("Failed to log out: ${response.reasonPhrase}");
+      }
     } catch (e) {
-      print(e.toString());
+     log("Error during logout: $e");
     }
   }
   @override
@@ -57,13 +71,49 @@ class MyDrawer extends StatelessWidget {
           MyDrawerTile(
             title: "P R O F I L E",
             icon: Icons.person,
-            onTap: () {}, 
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                    url: 'https://via.placeholder.com/150', // placeholder until replaced with actual profile picture
+                    username: 'TestUser123', // placeholder until replaced with actual username
+                    email: 'testuser@example.com', // placeholder until replaced with actual email
+                    classes: ['Math 101', 'Physics 202'], // placeholder until replaced with actual classes
+                  ),
+                ),
+              );
+            },
           ), 
+
+
+          // chatbot
+          MyDrawerTile(
+            title: "C H A T B O T",
+            icon: Icons.chat,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/chatbot');
+            },
+          ),
+          
+          // assignments
+          MyDrawerTile(
+            title: "A S S I G N M E N T S",
+            icon: Icons.assignment,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/assignments');
+            },
+          ),
+
           //search list
           MyDrawerTile(
             title: "S E A R C H",
             icon: Icons.search,
             onTap: () {}, 
+            
           ), 
           //settings
           MyDrawerTile(
@@ -75,7 +125,7 @@ class MyDrawer extends StatelessWidget {
               Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => Settings(),
+                builder: (context) => const Settings(),
             )
             );
 
@@ -88,7 +138,7 @@ class MyDrawer extends StatelessWidget {
           MyDrawerTile(
             title: "L O G O U T",
             icon: Icons.logout,
-            onTap: logout,
+            onTap: () => logout(context),
           ), 
         ],
       )

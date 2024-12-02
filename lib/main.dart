@@ -1,23 +1,26 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:matt_lads_app/firebase_options.dart';
+import 'package:matt_lads_app/pages/chatbot_page.dart';
+import 'package:matt_lads_app/pages/assignments_page.dart';
+import 'package:matt_lads_app/pages/login_page.dart';
 import 'package:matt_lads_app/services/auth/auth_gate.dart';
-import 'package:matt_lads_app/services/auth/login_or_register.dart';
 import 'package:provider/provider.dart';
 import 'package:matt_lads_app/themes/theme_provider.dart';
+import 'package:matt_lads_app/pages/feed.dart';
+import 'package:matt_lads_app/pages/profile.dart';
+import 'package:matt_lads_app/pages/register_page.dart';
+import 'package:matt_lads_app/pages/settings.dart';
+import 'package:matt_lads_app/services/auth/backend_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer';
+
 
 void main() async {
-
-  //FIREBASE SETUP HERE.
-
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
       child: const PostApp(),
-    )
+    ),
   );
 }
 
@@ -26,11 +29,44 @@ class PostApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = BackendAuthService();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const AuthGate(),
-      //home: HomePage(),
-      theme: Provider.of<ThemeProvider>(context). themeData,
+      theme: Provider.of<ThemeProvider>(context).themeData,
+      routes: {
+        '/':(context) => AuthGate(),
+        //'/forum': (context) => const HomePage(), 
+        '/forum/': (context) => const HomePage(),
+        '/profile': (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+          return ProfilePage(
+            url: args?['url'] ?? 'https://via.placeholder.com/150', // Default or passed profile picture URL
+            username: args?['username'] ?? 'DefaultUser', // Default or passed username
+            email: args?['email'] ?? 'No email provided', // Default or passed email
+            classes: args?['classes'] ?? [], // Default or passed list of classes
+          );
+        },
+        
+        '/register': (context) => RegisterPage(
+          onRegister: (username, password) async {
+            try {
+              await authService.register(username, password);
+              Navigator.of(context).pushReplacementNamed('/forum/');
+            } catch (e) {
+              print(e); // Handle error (e.g., show a dialog)
+            }
+          },
+          onLogin: () {
+            Navigator.of(context).pushReplacementNamed('/login');
+          },
+        ),
+        '/settings': (context) => const Settings(),
+        '/chatbot': (context) => const ChatbotPage(),
+        '/assignments': (context) => const AssignmentsPage(),
+
+
+      },
     );
   }
 }
