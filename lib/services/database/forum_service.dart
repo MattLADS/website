@@ -46,7 +46,6 @@ class ForumService {
       url,
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': 'username=$cookies',
       },
       body: json.encode({
         'title': title, 

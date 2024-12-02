@@ -6,7 +6,7 @@ class ChatbotService {
   static const String baseUrl = 'http://localhost:8080';
 
   Future<String> sendMessage(String message) async {
-    final url = Uri.parse('$baseUrl/chatbot/');
+    final url = Uri.parse('$baseUrl/chatbot');
     log("Sending message to chatbot: $message");
 
     final response = await http.post(
@@ -19,8 +19,7 @@ class ChatbotService {
     log('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return data['response'];
+      return response.body;
     } else {
       throw Exception('Failed to get response from chatbot');
     }
