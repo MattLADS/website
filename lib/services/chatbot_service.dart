@@ -6,7 +6,7 @@ class ChatbotService {
   static const String baseUrl = 'http://localhost:8080';
 
   Future<String> sendMessage(String message) async {
-    final url = Uri.parse('$baseUrl/chatbot');
+    final url = Uri.parse('$baseUrl/chatbot/');
     log("Sending message to chatbot: $message");
 
     final response = await http.post(

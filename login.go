@@ -117,23 +117,19 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Login successful, setting session token")
 
 		http.SetCookie(w, &http.Cookie{
-			Name:     "session_token",
-			Value:    "authenticated",
-			Path:     "/",
-			HttpOnly: true,
-			SameSite: http.SameSiteNoneMode, // Allow cross-origin requests
-			Secure:   false,                 // Set to true if using HTTPS
+			Name:  "session_token",
+			Value: "authenticated",
+			Path:  "/",
+			//SameSite: http.SameSiteNoneMode, // Allow cross-origin requests
 		})
 
 		// Set a cookie with session ID
 		http.SetCookie(w, &http.Cookie{
-			Name:     "session_id",
-			Value:    sessionID,
-			Expires:  time.Now().Add(24 * time.Hour),
-			Path:     "/",
-			HttpOnly: true,
-			SameSite: http.SameSiteNoneMode,
-			Secure:   false,
+			Name:    "session_id",
+			Value:   sessionID,
+			Expires: time.Now().Add(24 * time.Hour),
+			Path:    "/",
+			//SameSite: http.SameSiteNoneMode,
 		})
 
 		http.SetCookie(w, &http.Cookie{
