@@ -12,9 +12,10 @@ import (
 
 // User represents a user with a unique ID, username, and password.
 type User struct {
-	ID       uint   `gorm:"primaryKey"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	ID        uint   `gorm:"primaryKey"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	IsTeacher string `json:"isTeacher"`
 }
 
 // authMiddleware checks if the user is authenticated.
@@ -64,6 +65,16 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		log.Printf("Set-Cookie header for username: %s", request.Username)
 
+		http.SetCookie(w, &http.Cookie{
+			Name:     "is_teacher",
+			Value:    request.IsTeacher,
+			Expires:  time.Now().Add(24 * time.Hour),
+			Path:     "/",
+			HttpOnly: true,
+			//SameSite: http.SameSiteNoneMode,
+			//Secure:   false,
+		})
+
 		//create new user
 		newUser := User{Username: request.Username, Password: request.Password}
 		if err := forumDB.Create(&newUser).Error; err != nil {
@@ -84,8 +95,9 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "POST" {
 		var request struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
+			Username  string `json:"username"`
+			Password  string `json:"password"`
+			IsTeacher string `json:"isTeacher"`
 		}
 
 		// Decode JSON body
@@ -121,6 +133,16 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			Value: "authenticated",
 			Path:  "/",
 			//SameSite: http.SameSiteNoneMode, // Allow cross-origin requests
+		})
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "is_teacher",
+			Value:    request.IsTeacher,
+			Expires:  time.Now().Add(24 * time.Hour),
+			Path:     "/",
+			HttpOnly: true,
+			//SameSite: http.SameSiteNoneMode,
+			//Secure:   false,
 		})
 
 		// Set a cookie with session ID
@@ -168,6 +190,12 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &http.Cookie{
 		Name:  "username",
+		Value: "",
+		Path:  "/",
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:  "is_teacher",
 		Value: "",
 		Path:  "/",
 	})
