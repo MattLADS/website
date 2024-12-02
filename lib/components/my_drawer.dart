@@ -105,6 +105,15 @@ class MyDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/assignments');
             },
           ),
+          
+          MyDrawerTile(
+            title: "M E S S A G E S",
+            icon: Icons.chat_bubble,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/direct_messages');
+            },
+          ),
 
           //settings
           MyDrawerTile(

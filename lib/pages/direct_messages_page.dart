@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:matt_lads_app/services/chatbot_service.dart';
 import 'package:provider/provider.dart';
 import 'package:matt_lads_app/themes/theme_provider.dart';
 
-class ChatbotPage extends StatefulWidget {
-  const ChatbotPage({super.key});
+class DirectMessagesPage extends StatefulWidget {
+  final String selectedUser;
+
+  const DirectMessagesPage({super.key, required this.selectedUser});
 
   @override
-  State<ChatbotPage> createState() => _ChatbotPageState();
+  State<DirectMessagesPage> createState() => _DirectMessagesPageState();
 }
-class _ChatbotPageState extends State<ChatbotPage> {
+
+class _DirectMessagesPageState extends State<DirectMessagesPage> {
   final TextEditingController _messageController = TextEditingController();
-  final ChatbotService _chatbotService = ChatbotService();
   final List<Map<String, String>> _messages = [];
 
   Future<void> _sendMessage() async {
@@ -24,16 +25,11 @@ class _ChatbotPageState extends State<ChatbotPage> {
 
     _messageController.clear();
 
-    try {
-      final response = await _chatbotService.sendMessage(message);
-      setState(() {
-        _messages.add({'sender': 'bot', 'message': response});
-      });
-    } catch (e) {
-      setState(() {
-        _messages.add({'sender': 'bot', 'message': 'Failed to get response from chatbot'});
-      });
-    }
+    // Simulate a response from the other user
+    await Future.delayed(const Duration(seconds: 1));
+    setState(() {
+      _messages.add({'sender': 'other', 'message': 'This is a response message'});
+    });
   }
 
   @override
@@ -43,13 +39,13 @@ class _ChatbotPageState extends State<ChatbotPage> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text("C H A T B O T"),
-        foregroundColor: Theme.of(context).colorScheme.primary,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text("C H A T  W I T H ${widget.selectedUser}"),
+        foregroundColor: theme.colorScheme.primary,
+        backgroundColor: theme.colorScheme.secondary,
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
+          color: theme.colorScheme.background,
         ),
         child: Column(
           children: [
@@ -65,7 +61,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: isUser ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
+                        color: isUser ? theme.colorScheme.primary : theme.colorScheme.secondary,
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
@@ -77,7 +73,11 @@ class _ChatbotPageState extends State<ChatbotPage> {
                       ),
                       child: Text(
                         message['message']!,
-                        style: TextStyle(color:  Theme.of(context).colorScheme.onSecondary),
+                        style: TextStyle(
+                          color: isUser ? theme.colorScheme.onPrimary : theme.colorScheme.onSecondary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   );
@@ -94,7 +94,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                       decoration: InputDecoration(
                         hintText: 'Type a message...',
                         filled: true,
-                        fillColor: Theme.of(context).colorScheme.surface,
+                        fillColor: theme.colorScheme.surface,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
@@ -107,7 +107,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                   FloatingActionButton(
                     onPressed: _sendMessage,
                     child: const Icon(Icons.send),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    backgroundColor: theme.colorScheme.primary,
                   ),
                 ],
               ),
