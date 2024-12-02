@@ -8,20 +8,20 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
 
-  final ForumService _forumService = ForumService();
-  late Future<List<Map<String, dynamic>>> _topicsFuture;
+  final ForumService forumService = ForumService();
+  late Future<List<Map<String, dynamic>>> topicsFuture;
 
   @override
   void initState() {
     super.initState();
     log('Initializing HomePage - Fetching topics...');
-    _topicsFuture = _forumService.fetchTopics();
-    log('_topicsFuture initialized.');
+    topicsFuture = forumService.fetchTopics();
+    log('topicsFuture initialized.');
   }
 
   @override
@@ -34,18 +34,8 @@ class _HomePageState extends State<HomePage> {
         title: const Text("H O M E"),
         foregroundColor: Theme.of(context).colorScheme.primary,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          log("floatingActionButton pressed");
-          newPostButtonInfo();
-        },
-        child: Icon(Icons.add),
-        tooltip: 'Create New Post',
-      ),
-
-      
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _topicsFuture,
+        future: topicsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -56,100 +46,141 @@ class _HomePageState extends State<HomePage> {
             log('Topics retrieved: ${snapshot.data}');
             return const Center(child: Text('No topics available'));
           } else {
+            log("FutureBuilder received data: ${snapshot.data}");
             List<Map<String, dynamic>> topics = snapshot.data!;
+            //log("FutureBuilder received data: $topics");
             return ListView.builder(
               itemCount: topics.length,
               itemBuilder: (context, index) {
                 final topic = topics[index];
-                final title = topic['title'] ?? 'No Title'; // Provide a default if null
-                final content = topic['content'] ?? 'No Content'; // Provide a default if null
-    
+                final title = topic['Title'] ?? 'Untitled Post'; // Provide a default if null
+                final content = topic['Content'] ?? 'No Content'; // Provide a default if null
+                final username = topic['Username'] ?? 'Unknown User'; // Provide a default if null
+
                 return ListTile(
                   title: Text(title),
-                  subtitle: Text(content),
+                  subtitle: Text("Author: @$username\n$content"),
                   onTap: () {
-                    //eventually Navigate to a topic detail page
-                    },
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text(title),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text("Author: @$username"),
+                              const SizedBox(height: 10),
+                              Text(content),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 );
               },
             );
           }
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          print("floating action button pressed");
+          newPostButtonInfo();
+        },
+        child: Icon(Icons.add),
+        tooltip: 'Create New Post',
+      ),
     );
   }
-  
+
   void newPostButtonInfo() {
+    final postTopic = TextEditingController();
+    final postContent = TextEditingController();
+
     log('newPostButtonInfo called');
     showDialog(
-    context: context,
-    builder: (context) {
-      final postTopic = TextEditingController();
-      final postContent = TextEditingController();
-      final ForumService forumService = ForumService();
-
-      return AlertDialog(
-        title: Text('Create New Post'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: postTopic,
-              decoration: InputDecoration(labelText: 'Topic'),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: postContent,
-              decoration: InputDecoration(labelText: 'Content'),
-              maxLines: 3,
+      context: context,
+      builder: (context) {
+        log('Dialog builder called');
+        return AlertDialog(
+          title: const Text('Create New Post'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: postTopic,
+                decoration: const InputDecoration(labelText: 'Post Title'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: postContent,
+                decoration: const InputDecoration(labelText: 'Post Content'),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                final title = postTopic.text;
+                final content = postContent.text;
+                
+                if (title.isNotEmpty && content.isNotEmpty) {
+                  try{
+                    await ForumService().postTopic(title, content);
+                    Navigator.of(context).pop();
+                    setState(() {
+                        // Refresh feed after post
+                        topicsFuture = ForumService().fetchTopics();
+                     });
+                  } catch(e){
+                    log('Error submitting post: $e');
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Error'),
+                        content: const Text('Failed to submit post'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  } else {
+                    log('Title or content is empty');
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Error'),
+                        content: Text('Title and content cannot be empty.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              child: const Text('Submit'),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              log('Submit button pressed');
-              final title = postTopic.text;
-              final content = postContent.text;
-
-              if (title.isNotEmpty && content.isNotEmpty) {
-                log('Calling postTopic with Title: $title, Content: $content');
-                try {
-                  await forumService.postTopic(title, content);
-                  Navigator.of(context).pop(); // Close the pop up
-                  setState(() {
-                    _topicsFuture = forumService.fetchTopics(); // Refresh topics
-                  });
-                  log('Post submitted successfully and feed updated');
-                } catch (e) {
-                  log('Error submitting post: $e');
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text('Error'),
-                      content: Text('Failed to submit post. Error: $e.'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: Text('OK'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              }
-            },
-            child: Text('Submit'),
-          ),
-        ],
-      );
-    },
-  );
+        );
+      },
+    ).then((_) {
+      log('Dialog dismissed'); // Log when dialog is closed
+    });
   }
 }

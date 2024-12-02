@@ -2,15 +2,26 @@ import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
   final String url;
+  final String username; 
+  final String email; 
+  final List<String> classes; // Add a list of classes - not yet implemented
+  
 
-  const ProfilePage({super.key, required this.url});
+  const ProfilePage({
+    super.key, 
+    required this.url, 
+    required this.username, 
+    this.email = "Email not required", // will add emails to register page later
+    this.classes = const [], // Default to an empty list for now
+    });
 
   @override
   ProfilePageState createState() => ProfilePageState();
+  
 }
 
 class ProfilePageState extends State<ProfilePage> {
-  int _selectedItemIndex = 0;
+  int _selectedItemIndex = 0; 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,15 +68,15 @@ class ProfilePageState extends State<ProfilePage> {
           const SizedBox(
             height: 10,
           ),
-          const Text(
-            "Tom Smith",
+          Text(
+            "@${widget.username}",
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            "Student",
+            widget.email, // Show email
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.grey[400],
@@ -74,13 +85,19 @@ class ProfilePageState extends State<ProfilePage> {
           const SizedBox(
             height: 20,
           ),
-          Row(
+          Column(
+            children: [
+              const Text("Classes:", style: TextStyle(fontWeight: FontWeight.bold)),
+              ...widget.classes.map((cls) => Text(cls)).toList(), // Display all classes
+            ],
+          ),
+          /*Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               buildStatColumn("53", "Posts"),
               buildStatColumn("4", "Classes"),
             ],
-          ),
+          ),*/
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(left: 8, right: 8, top: 8),
@@ -88,7 +105,9 @@ class ProfilePageState extends State<ProfilePage> {
                   color: Colors.grey.withOpacity(0.15),
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(25))),
-              child: GridView.count(
+              child: const Center(child: Text("Your Profile Information")), //Placeholder
+              /*
+              GridView.count(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
                 crossAxisCount: 2,
                 crossAxisSpacing: 5,
@@ -101,12 +120,13 @@ class ProfilePageState extends State<ProfilePage> {
                       "This is a post"),
                   buildPostCard(
                       "This is a post"),
-                ],
-              ),
+                ],*/
             ),
           )
         ],
       ),
+      /*
+      //commenting out because idk if necessary right now
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: SizedBox(
         height: 60,
@@ -121,6 +141,7 @@ class ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
+      
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
             boxShadow: [
@@ -140,7 +161,7 @@ class ProfilePageState extends State<ProfilePage> {
             buildNavBarItem(Icons.person, 3),
           ],
         ),
-      ),
+      ),*/
     );
   }
 

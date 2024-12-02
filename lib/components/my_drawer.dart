@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:matt_lads_app/components/my_drawer_tile.dart';
+import 'package:matt_lads_app/pages/profile.dart';
 import 'package:matt_lads_app/pages/settings.dart';
 import 'package:http/http.dart' as http;
 
@@ -70,7 +71,20 @@ class MyDrawer extends StatelessWidget {
           MyDrawerTile(
             title: "P R O F I L E",
             icon: Icons.person,
-            onTap: () {}, 
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                    url: 'https://via.placeholder.com/150', // placeholder until replaced with actual profile picture
+                    username: 'TestUser123', // placeholder until replaced with actual username
+                    email: 'testuser@example.com', // placeholder until replaced with actual email
+                    classes: ['Math 101', 'Physics 202'], // placeholder until replaced with actual classes
+                  ),
+                ),
+              );
+            },
           ), 
 
 
@@ -99,6 +113,7 @@ class MyDrawer extends StatelessWidget {
             title: "S E A R C H",
             icon: Icons.search,
             onTap: () {}, 
+            
           ), 
           //settings
           MyDrawerTile(
