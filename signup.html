@@ -1,15 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Sign Up</h1>
-    <form action="/signup/" method="post">
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" required><br><br>
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required><br><br>
+    <form action="/signup/" method="post" autocomplete="off">
+        <!-- Email Field -->
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" placeholder="Enter your email" required>
+        </div>
+        
+        <!-- Username Field -->
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" placeholder="Choose a username" required>
+        </div>
+        
+        <!-- Password Field -->
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" placeholder="Choose a password" required>
+        </div>
+        
         <button type="submit">Sign Up</button>
     </form>
 </body>
