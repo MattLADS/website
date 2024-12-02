@@ -228,7 +228,7 @@
         <div class="sidebar-options">
             <a onclick="showContent('class-feed')">Class Feed</a>
             <a onclick="showContent('notifications')">Notifications</a>
-            <a onclick="showContent('dms')">DMs</a>
+            <a onclick="showContent('dms')">DMs</a>   <!-- <a onclick="showContent('dms')">DMs</a> -->
             <a onclick="showContent('calendar')">Calendar</a>
             <a onclick="showContent('search')">Search</a>
             <a onclick="showContent('settings')">Settings</a>
@@ -337,3 +337,416 @@
     </script>
 </body>
 </html>
+
+
+
+
+<!-- <!DOCTYPE html> -->
+<!-- <html lang="en"> -->
+<!-- <head> -->
+<!--     <meta charset="UTF-8"> -->
+<!--     <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+<!--     <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+<!--     <style> -->
+<!--         /* Styling for the main body */ -->
+<!--         body { -->
+<!--             background-color: #006400; /* Dark green */ -->
+<!--             color: white; -->
+<!--             display: flex; -->
+<!--             height: 100vh; -->
+<!--             margin: 0; -->
+<!--             overflow: hidden; -->
+<!--         } -->
+<!--  -->
+<!--         /* Sidebar styling */ -->
+<!--         .sidebar { -->
+<!--             height: 100vh; -->
+<!--             width: 250px; -->
+<!--             background-color: #228B22; /* Forest green */ -->
+<!--             position: fixed; -->
+<!--             display: flex; -->
+<!--             flex-direction: column; -->
+<!--             padding: 20px 10px; -->
+<!--             color: white; -->
+<!--         } -->
+<!--  -->
+<!--         /* Sidebar title styling */ -->
+<!--         .sidebar-title { -->
+<!--             font-size: 24px; -->
+<!--             font-weight: bold; -->
+<!--             color: gold; -->
+<!--             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); -->
+<!--             margin-bottom: 20px; -->
+<!--         } -->
+<!--  -->
+<!--         /* Sidebar options link styling */ -->
+<!--         .sidebar-options a { -->
+<!--             text-decoration: none; -->
+<!--             color: white; -->
+<!--             padding: 10px; -->
+<!--             margin: 5px 0; -->
+<!--             border-radius: 5px; -->
+<!--             display: block; -->
+<!--             transition: background-color 0.3s; -->
+<!--             cursor: pointer; -->
+<!--         } -->
+<!--  -->
+<!--         .sidebar-options a:hover { -->
+<!--             background-color: #1a6e1a; -->
+<!--         } -->
+<!--  -->
+<!--         /* Main content area styling */ -->
+<!--         .content { -->
+<!--             margin-left: 270px; -->
+<!--             padding: 20px; -->
+<!--             width: calc(100% - 270px); -->
+<!--             overflow-y: auto; -->
+<!--         } -->
+<!--  -->
+<!--         /* Dynamic content box styling */ -->
+<!--         .dynamic-content { -->
+<!--             background-color: #004d00; -->
+<!--             padding: 20px; -->
+<!--             border-radius: 8px; -->
+<!--             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); -->
+<!--         } -->
+<!--  -->
+<!--         /* Header styling */ -->
+<!--         h2 { -->
+<!--             margin: 0 0 10px 0; -->
+<!--             color: gold; -->
+<!--         } -->
+<!--  -->
+<!--         /* Calendar-specific styles */ -->
+<!--         .calendar-container { -->
+<!--             display: flex; -->
+<!--             flex-direction: column; -->
+<!--             align-items: center; -->
+<!--         } -->
+<!--  -->
+<!--         .calendar-header { -->
+<!--             display: flex; -->
+<!--             justify-content: space-between; -->
+<!--             align-items: center; -->
+<!--             width: 100%; -->
+<!--             max-width: 500px; -->
+<!--             margin-bottom: 10px; -->
+<!--             font-weight: bold; -->
+<!--         } -->
+<!--  -->
+<!--         .calendar { -->
+<!--             display: grid; -->
+<!--             grid-template-columns: repeat(7, 1fr); /* 7 columns for the days of the week */ -->
+<!--             gap: 5px; -->
+<!--             text-align: center; -->
+<!--             max-width: 500px; -->
+<!--         } -->
+<!--  -->
+<!--         .weekday { -->
+<!--             font-weight: bold; -->
+<!--             color: gold; -->
+<!--             margin-bottom: 5px; -->
+<!--         } -->
+<!--  -->
+<!--         .day { -->
+<!--             padding: 10px; -->
+<!--             border-radius: 4px; -->
+<!--             background-color: #2e8b57; /* Medium green for days */ -->
+<!--             color: white; -->
+<!--             cursor: pointer; -->
+<!--         } -->
+<!--  -->
+<!--         .day.today { -->
+<!--             background-color: gold; /* Highlight today's date */ -->
+<!--             color: black; -->
+<!--         } -->
+<!--  -->
+<!--         .day.event { -->
+<!--             background-color: #ffa500; /* Orange for days with events */ -->
+<!--         } -->
+<!--  -->
+<!--         .event-list { -->
+<!--             margin-top: 20px; -->
+<!--             background-color: #003300; /* Dark green for event list */ -->
+<!--             padding: 10px; -->
+<!--             border-radius: 8px; -->
+<!--             max-height: 150px; -->
+<!--             overflow-y: auto; -->
+<!--         } -->
+<!--  -->
+<!--         .event-item { -->
+<!--             padding: 5px; -->
+<!--             margin: 5px 0; -->
+<!--             background-color: #006400; /* Green for event items */ -->
+<!--             border-radius: 4px; -->
+<!--             color: white; -->
+<!--         } -->
+<!--  -->
+<!--         .add-event-form { -->
+<!--             margin-top: 20px; -->
+<!--             display: flex; -->
+<!--             gap: 10px; -->
+<!--         } -->
+<!--  -->
+<!--         .add-event-form input, -->
+<!--         .add-event-form button { -->
+<!--             padding: 8px; -->
+<!--             border-radius: 4px; -->
+<!--             border: none; -->
+<!--         } -->
+<!--  -->
+<!--         .add-event-form input { -->
+<!--             flex: 1; -->
+<!--         } -->
+<!--  -->
+<!--         .add-event-form button { -->
+<!--             background-color: blue; /* Blue for buttons */ -->
+<!--             color: white; -->
+<!--             cursor: pointer; -->
+<!--         } -->
+<!--  -->
+<!--         .add-event-form button:hover { -->
+<!--             background-color: darkblue; /* Dark blue on hover */ -->
+<!--         } -->
+<!--  -->
+<!--         .nav-button { -->
+<!--             background-color: blue; -->
+<!--             color: white; -->
+<!--             border: none; -->
+<!--             padding: 5px 10px; -->
+<!--             cursor: pointer; -->
+<!--             border-radius: 4px; -->
+<!--         } -->
+<!--  -->
+<!--         .nav-button:hover { -->
+<!--             background-color: darkblue; -->
+<!--         } -->
+<!--  -->
+<!--         /* DM-specific styles */ -->
+<!--         .dm-container { -->
+<!--             display: flex; -->
+<!--             flex: 1; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-users { -->
+<!--             width: 30%; -->
+<!--             background-color: #228B22; -->
+<!--             padding: 10px; -->
+<!--             overflow-y: auto; -->
+<!--             border-right: 1px solid #004d00; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-users h3 { -->
+<!--             color: gold; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-users .user { -->
+<!--             padding: 10px; -->
+<!--             margin-bottom: 5px; -->
+<!--             background-color: #2e8b57; -->
+<!--             border-radius: 4px; -->
+<!--             cursor: pointer; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-users .user:hover { -->
+<!--             background-color: #1a6e1a; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-chat { -->
+<!--             flex: 1; -->
+<!--             display: flex; -->
+<!--             flex-direction: column; -->
+<!--             padding: 10px; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-chat-messages { -->
+<!--             flex: 1; -->
+<!--             overflow-y: auto; -->
+<!--             background-color: #004d00; -->
+<!--             padding: 10px; -->
+<!--             border-radius: 8px; -->
+<!--             margin-bottom: 10px; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-message { -->
+<!--             padding: 8px; -->
+<!--             margin: 5px 0; -->
+<!--             background-color: #2e8b57; -->
+<!--             color: white; -->
+<!--             border-radius: 4px; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-message.sent { -->
+<!--             background-color: #006400; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-message.received { -->
+<!--             background-color: #228B22; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-input-container { -->
+<!--             display: flex; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-input { -->
+<!--             flex: 1; -->
+<!--             padding: 10px; -->
+<!--             border-radius: 4px; -->
+<!--             border: 1px solid #ccc; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-send-button { -->
+<!--             background-color: blue; -->
+<!--             color: white; -->
+<!--             padding: 10px; -->
+<!--             border: none; -->
+<!--             border-radius: 4px; -->
+<!--             margin-left: 5px; -->
+<!--             cursor: pointer; -->
+<!--         } -->
+<!--  -->
+<!--         .dm-send-button:hover { -->
+<!--             background-color: darkblue; -->
+<!--         } -->
+<!--     </style> -->
+<!-- </head> -->
+<!-- <body> -->
+<!--     <div class="sidebar"> -->
+<!--         <div class="sidebar-title">MATTLADS</div> -->
+<!--         <div class="sidebar-options"> -->
+<!--             <a onclick="showContent('class-feed')">Class Feed</a> -->
+<!--             <a onclick="showContent('notifications')">Notifications</a> -->
+<!--             <a onclick="showContent('dms')">DMs</a> -->
+<!--             <a onclick="showContent('calendar')">Calendar</a> -->
+<!--             <a onclick="showContent('search')">Search</a> -->
+<!--             <a onclick="showContent('settings')">Settings</a> -->
+<!--             <a onclick="window.location.href='/forum/'">Forum</a> -->
+<!--             <a onclick="window.location.href='/profile/'">Profile</a> -->
+<!--         </div> -->
+<!--         <button class="sign-out-button" onclick="window.location.href='/signout/'">Sign Out</button> -->
+<!--     </div> -->
+<!--  -->
+<!--     <div class="content"> -->
+<!--         <div id="dynamic-content" class="dynamic-content"> -->
+<!--             <h2>Welcome!</h2> -->
+<!--             <p>Select an option from the sidebar to see its content here.</p> -->
+<!--         </div> -->
+<!--     </div> -->
+<!--  -->
+<!--     <script> -->
+<!--         const messages = {}; -->
+<!--         let currentUser = null; -->
+<!--  -->
+<!--         function showContent(option) { -->
+<!--             const content = document.getElementById('dynamic-content'); -->
+<!--             if (option === 'dms') { -->
+<!--                 content.innerHTML = ` -->
+<!--                     <div class="dm-container"> -->
+<!--                         <div class="dm-users"> -->
+<!--                             <h3>Users</h3> -->
+<!--                             <div class="user" onclick="selectUser('Alice')">Alice</div> -->
+<!--                             <div class="user" onclick="selectUser('Bob')">Bob</div> -->
+<!--                             <div class="user" onclick="selectUser('Charlie')">Charlie</div> -->
+<!--                         </div> -->
+<!--                         <div class="dm-chat"> -->
+<!--                             <div id="dm-chat-messages" class="dm-chat-messages"> -->
+<!--                                 <p>Select a user to start chatting.</p> -->
+<!--                             </div> -->
+<!--                             <div class="dm-input-container"> -->
+<!--                                 <input id="dm-input" class="dm-input" placeholder="Type a message..." disabled> -->
+<!--                                 <button id="dm-send-button" class="dm-send-button" onclick="sendMessage()" disabled>Send</button> -->
+<!--                             </div> -->
+<!--                         </div> -->
+<!--                     </div> -->
+<!--                 `; -->
+<!--             } else if (option === 'calendar') { -->
+<!--                 content.innerHTML = ` -->
+<!--                     <h2>Calendar</h2> -->
+<!--                     <div class="calendar-container"> -->
+<!--                         <div class="calendar-header"> -->
+<!--                             <button class="nav-button" onclick="changeMonth(-1)">&#9664;</button> -->
+<!--                             <span id="calendar-title"></span> -->
+<!--                             <button class="nav-button" onclick="changeMonth(1)">&#9654;</button> -->
+<!--                         </div> -->
+<!--                         <div class="calendar"> -->
+<!--                             <div class="weekday">Sun</div> -->
+<!--                             <div class="weekday">Mon</div> -->
+<!--                             <div class="weekday">Tue</div> -->
+<!--                             <div class="weekday">Wed</div> -->
+<!--                             <div class="weekday">Thu</div> -->
+<!--                             <div class="weekday">Fri</div> -->
+<!--                             <div class="weekday">Sat</div> -->
+<!--                             <div id="calendar-grid" class="calendar-grid"></div> -->
+<!--                         </div> -->
+<!--                         <div class="add-event-form"> -->
+<!--                             <input type="text" id="event-input" placeholder="Add an event..."> -->
+<!--                             <button onclick="addEvent()">Add Event</button> -->
+<!--                         </div> -->
+<!--                         <div id="event-list" class="event-list"></div> -->
+<!--                     </div> -->
+<!--                 `; -->
+<!--                 renderCalendar(); -->
+<!--             } else if (option === 'search' || option === 'settings') { -->
+<!--                 const titles = { -->
+<!--                     'search': 'Search', -->
+<!--                     'settings': 'Settings', -->
+<!--                 }; -->
+<!--                 content.innerHTML = `<h2>${titles[option]}</h2><p>Content for ${titles[option]}.</p>`; -->
+<!--             } else { -->
+<!--                 content.innerHTML = `<h2>Welcome!</h2><p>Select an option from the sidebar to see its content here.</p>`; -->
+<!--             } -->
+<!--         } -->
+<!--  -->
+<!--         function selectUser(user) { -->
+<!--             currentUser = user; -->
+<!--             document.getElementById('dm-input').disabled = false; -->
+<!--             document.getElementById('dm-send-button').disabled = false; -->
+<!--             loadMessages(user); -->
+<!--         } -->
+<!--  -->
+<!--         function loadMessages(user) { -->
+<!--             const container = document.getElementById('dm-chat-messages'); -->
+<!--             const dmKey = `currentUser-${user}`; -->
+<!--             container.innerHTML = ""; -->
+<!--             if (messages[dmKey]) { -->
+<!--                 messages[dmKey].forEach(msg => { -->
+<!--                     const msgClass = msg.sender === 'currentUser' ? "sent" : "received"; -->
+<!--                     const messageDiv = `<div class="dm-message ${msgClass}">${msg.content}</div>`; -->
+<!--                     container.innerHTML += messageDiv; -->
+<!--                 }); -->
+<!--             } -->
+<!--         } -->
+<!--  -->
+<!--         function sendMessage() { -->
+<!--             const input = document.getElementById('dm-input'); -->
+<!--             const messageContent = input.value.trim(); -->
+<!--             if (messageContent && currentUser) { -->
+<!--                 const dmKey = `currentUser-${currentUser}`; -->
+<!--                 if (!messages[dmKey]) { -->
+<!--                     messages[dmKey] = []; -->
+<!--                 } -->
+<!--                 messages[dmKey].push({ sender: 'currentUser', content: messageContent }); -->
+<!--                 input.value = ""; -->
+<!--                 loadMessages(currentUser); -->
+<!--             } -->
+<!--         } -->
+<!--  -->
+<!--         function changeMonth(direction) { -->
+<!--             // Logic to change the month -->
+<!--         } -->
+<!--  -->
+<!--         function renderCalendar() { -->
+<!--             // Logic to render the calendar -->
+<!--         } -->
+<!--  -->
+<!--         function addEvent() { -->
+<!--             const eventInput = document.getElementById('event-input'); -->
+<!--             const eventValue = eventInput.value.trim(); -->
+<!--             if (eventValue) { -->
+<!--                 // Logic to add the event -->
+<!--                 eventInput.value = ''; // Clear the input field -->
+<!--             } -->
+<!--         } -->
+<!--     </script> -->
+<!-- </body> -->
+<!-- </html> -->

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Messages</title>
+    <style>
+        /* Same DM-specific styles from before */
+        body {
+            background-color: #006400; /* Dark green */
+            color: white;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .dm-container {
+            display: flex;
+            flex: 1;
+        }
+
+        .dm-users {
+            width: 30%;
+            background-color: #228B22;
+            padding: 10px;
+            overflow-y: auto;
+            border-right: 1px solid #004d00;
+        }
+
+        .dm-users h3 {
+            color: gold;
+        }
+
+        .dm-users .user {
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: #2e8b57;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .dm-users .user:hover {
+            background-color: #1a6e1a;
+        }
+
+        .dm-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .dm-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #004d00;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .dm-message {
+            padding: 8px;
+            margin: 5px 0;
+            background-color: #2e8b57;
+            color: white;
+            border-radius: 4px;
+        }
+
+        .dm-message.sent {
+            background-color: #006400;
+        }
+
+        .dm-message.received {
+            background-color: #228B22;
+        }
+
+        .dm-input-container {
+            display: flex;
+        }
+
+        .dm-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .dm-send-button {
+            background-color: blue;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        .dm-send-button:hover {
+            background-color: darkblue;
+        }
+    </style>
+</head>
+<body>
+    <div class="dm-container">
+        <div class="dm-users">
+            <h3>Users</h3>
+            <!-- Users will be dynamically loaded here -->
+            <div id="user-list">Loading users...</div>
+        </div>
+        <div class="dm-chat">
+            <div id="dm-chat-messages" class="dm-chat-messages">
+                <p>Select a user to start chatting.</p>
+            </div>
+            <div class="dm-input-container">
+                <input id="dm-input" class="dm-input" placeholder="Type a message..." disabled>
+                <button id="dm-send-button" class="dm-send-button" onclick="sendMessage()" disabled>Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messages = {}; // In-memory storage for messages
+        let currentUser = null;
+
+// Function to fetch users from the server
+async function fetchUsers() {
+    try {
+        const response = await fetch('/api/users'); // Replace with your API endpoint
+        if (!response.ok) {
+            throw new Error('Failed to fetch users');
+        }
+        const users = await response.json();
+        renderUsers(users);
+    } catch (error) {
+        console.error(error);
+        const userList = document.getElementById('user-list');
+        userList.innerHTML = '<p>Error loading users</p>';
+    }
+}
+
+// Function to render the list of users
+function renderUsers(users) {
+    const userList = document.getElementById('user-list');
+    userList.innerHTML = ''; // Clear default users (Alice, Bob, Charlie)
+    if (users.length === 0) {
+        userList.innerHTML = '<p>No users found</p>';
+        return;
+    }
+
+    users.forEach(user => {
+        const userDiv = document.createElement('div');
+        userDiv.className = 'user';
+        userDiv.textContent = user.name; // Assuming `name` is the user's name
+        userDiv.onclick = () => selectUser(user.name);
+        userList.appendChild(userDiv);
+    });
+}
+
+// Call fetchUsers on page load
+fetchUsers();
+
+        function selectUser(user) {
+            currentUser = user;
+            document.getElementById('dm-input').disabled = false;
+            document.getElementById('dm-send-button').disabled = false;
+            loadMessages(user);
+        }
+
+        function loadMessages(user) {
+            const container = document.getElementById('dm-chat-messages');
+            const dmKey = `currentUser-${user}`;
+            container.innerHTML = "";
+
+            if (messages[dmKey]) {
+                messages[dmKey].forEach(msg => {
+                    const msgClass = msg.sender === 'currentUser' ? "sent" : "received";
+                    const messageDiv = `<div class="dm-message ${msgClass}">${msg.content}</div>`;
+                    container.innerHTML += messageDiv;
+                });
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('dm-input');
+            const messageContent = input.value.trim();
+            if (messageContent && currentUser) {
+                const dmKey = `currentUser-${currentUser}`;
+                if (!messages[dmKey]) {
+                    messages[dmKey] = [];
+                }
+
+                messages[dmKey].push({ sender: 'currentUser', content: messageContent });
+                input.value = "";
+                loadMessages(currentUser);
+            }
+        }
+
+        // Load users on page load
+        fetchUsers();
+    </script>
+</body>
+</html>
