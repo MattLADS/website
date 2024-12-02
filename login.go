@@ -1,10 +1,8 @@
 package main
 
-//import "C"
-
 import (
-	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"time"
@@ -12,10 +10,9 @@ import (
 
 // User represents a user with a unique ID, username, and password.
 type User struct {
-	ID        uint   `gorm:"primaryKey"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	IsTeacher string `json:"isTeacher"`
+	ID       uint   `gorm:"primaryKey"`
+	Username string `gorm:"unique"`
+	Password string
 }
 
 // authMiddleware checks if the user is authenticated.
@@ -32,59 +29,26 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		t, _ := template.ParseFiles("signup.html")
+		t.Execute(w, nil)
+	} else if r.Method == "POST" {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
 
-	log.Println("SignUpHandler called")
-	if r.Method == "POST" {
-		var request User
-
-		// Decode JSON body
-		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			http.Error(w, `{"error": "Invalid JSON format"}`, http.StatusBadRequest)
-			return
-		}
-		// Log received username and password for verification
-		log.Printf("Received login request - Username: %s, Password: %s\n", request.Username, request.Password)
-
-		//checking user info in database
 		var existingUser User
-		if err := forumDB.Where("username = ?", request.Username).First(&existingUser).Error; err == nil {
-			//http.Error(w, "Username already exists. Please choose another one.", http.StatusConflict)
-			// Send JSON response
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusConflict)
-			w.Write([]byte(`{"error": "Username already exists. Please choose another one."}`))
+		if err := forumDB.Where("username = ?", username).First(&existingUser).Error; err == nil {
+			http.Error(w, "Username already exists. Please choose another one.", http.StatusConflict)
 			return
 		}
-		// Set username cookie for the session
-		http.SetCookie(w, &http.Cookie{
-			Name:    "username",
-			Value:   request.Username,
-			Path:    "/",
-			Expires: time.Now().Add(24 * time.Hour), // Setting cookie expiration to 24hrs - we can change later.
-		})
-		log.Printf("Set-Cookie header for username: %s", request.Username)
 
-		http.SetCookie(w, &http.Cookie{
-			Name:     "is_teacher",
-			Value:    request.IsTeacher,
-			Expires:  time.Now().Add(24 * time.Hour),
-			Path:     "/",
-			HttpOnly: true,
-			//SameSite: http.SameSiteNoneMode,
-			//Secure:   false,
-		})
-
-		//create new user
-		newUser := User{Username: request.Username, Password: request.Password}
+		newUser := User{Username: username, Password: password}
 		if err := forumDB.Create(&newUser).Error; err != nil {
 			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
 			return
 		}
-		//changed redirect to send information in JSON format
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"message": " Created user successfully"}`))
+
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
@@ -93,35 +57,18 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("SignInHandler called")
 	log.Printf("Request method: %s", r.Method)
 
-	if r.Method == "POST" {
-		var request struct {
-			Username  string `json:"username"`
-			Password  string `json:"password"`
-			IsTeacher string `json:"isTeacher"`
-		}
+	if r.Method == "GET" {
+		t, _ := template.ParseFiles("signin.html")
+		t.Execute(w, nil)
+	} else if r.Method == "POST" {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+		log.Printf("Received username: %s, password: %s", username, password)
 
-		// Decode JSON body
-		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-			log.Println("Error decoding JSON:", err)
-			w.Header().Set("Content-Type", "application/json")
-			http.Error(w, `{"error": "Invalid JSON format"}`, http.StatusBadRequest)
-			return
-		}
-
-		log.Printf("Received username: %s, password: %s", request.Username, request.Password)
-
-		//checking user info in database
 		var user User
-		if err := forumDB.Where("username = ? AND password = ?", request.Username, request.Password).First(&user).Error; err != nil {
-			log.Println("Invalid username or password")
-			// Send JSON response for invalid credentials
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusUnauthorized)
-			//w.Write([]byte(`{"error": "Invalid username and password. Try again."}`))
-			json.NewEncoder(w).Encode(map[string]string{"error": "Invalid username and password. Try again."})
-
+		if err := forumDB.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
+			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 			return
-
 		}
 
 		// Create session if valid
@@ -132,17 +79,6 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			Name:  "session_token",
 			Value: "authenticated",
 			Path:  "/",
-			//SameSite: http.SameSiteNoneMode, // Allow cross-origin requests
-		})
-
-		http.SetCookie(w, &http.Cookie{
-			Name:     "is_teacher",
-			Value:    request.IsTeacher,
-			Expires:  time.Now().Add(24 * time.Hour),
-			Path:     "/",
-			HttpOnly: true,
-			//SameSite: http.SameSiteNoneMode,
-			//Secure:   false,
 		})
 
 		// Set a cookie with session ID
@@ -151,25 +87,16 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			Value:   sessionID,
 			Expires: time.Now().Add(24 * time.Hour),
 			Path:    "/",
-			//SameSite: http.SameSiteNoneMode,
 		})
 
 		http.SetCookie(w, &http.Cookie{
-			Name:     "username",
-			Value:    request.Username,
-			Expires:  time.Now().Add(24 * time.Hour),
-			Path:     "/",
-			HttpOnly: true,
-			//SameSite: http.SameSiteNoneMode,
-			//Secure:   false,
+			Name:    "username",
+			Value:   username,
+			Expires: time.Now().Add(24 * time.Hour),
+			Path:    "/",
 		})
-		log.Printf("Set-Cookie header for username: %s", request.Username)
 
-		log.Println("SignInHandler: Sending response")
-		//changed redirect to send information in JSON format
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Login was successful"}`))
+		http.Redirect(w, r, "/view/", http.StatusFound)
 	}
 }
 
@@ -194,31 +121,5 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 		Path:  "/",
 	})
 
-	http.SetCookie(w, &http.Cookie{
-		Name:  "is_teacher",
-		Value: "",
-		Path:  "/",
-	})
-
-	//changed redirect to send information in JSON format
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "Sign out was successful"}`))
-}
-
-// AuthStatusHandler checks if the user is logged in by verifying the session token.
-func AuthStatusHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("AuthStatusHandler called")
-
-	// Check if session_token cookie exists and is set to "authenticated"
-	cookie, err := r.Cookie("session_token")
-	if err != nil || cookie.Value != "authenticated" {
-		// If no valid session, return 401 Unauthorized
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	// If valid session, return 200 OK
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "Session is active"}`))
+	http.Redirect(w, r, "/", http.StatusFound)
 }

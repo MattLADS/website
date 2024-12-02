@@ -83,7 +83,7 @@
     <h2>Comments</h2>
     <ul class="comment-list">
         {{range .Comments}}
-        	<li>{{.Username}}: {{ .Content }}</li>
+        	<li>{{ . }}</li>
         {{else}}
         	<li>No comments yet.</li>
         {{end}}
