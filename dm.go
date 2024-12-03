@@ -16,6 +16,7 @@ type Message struct {
 	Recipient string    // Username of the recipient
 	Content   string    // Message content
 	Timestamp time.Time // When the message was sent
+	Read	  bool		`gorm:"default:false"`
 }
 
 
@@ -95,26 +96,67 @@ func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetMessagesHandler(w http.ResponseWriter, r *http.Request) {
-	sender, err := r.Cookie("username")
-	if err != nil {
-		http.Error(w, "User not authenticated", http.StatusUnauthorized)
-		return
-	}
+    sender, err := r.Cookie("username")
+    if err != nil {
+        http.Error(w, "User not authenticated", http.StatusUnauthorized)
+        return
+    }
 
-	recipient := r.URL.Query().Get("recipient")
-	if recipient == "" {
-		http.Error(w, "Recipient is required", http.StatusBadRequest)
-		return
-	}
+    recipient := r.URL.Query().Get("recipient")
+    if recipient == "" {
+        http.Error(w, "Recipient is required", http.StatusBadRequest)
+        return
+    }
 
-	var messages []Message
-	if err := forumDB.
-		Where("(sender = ? AND recipient = ?) OR (sender = ? AND recipient = ?)", sender.Value, recipient, recipient, sender.Value).
-		Order("timestamp").
-		Find(&messages).Error; err != nil {
-		http.Error(w, "Failed to fetch messages", http.StatusInternalServerError)
-		return
-	}
+    var messages []Message
+    // Fetch messages in both directions
+    if err := forumDB.
+        Where("(sender = ? AND recipient = ?) OR (sender = ? AND recipient = ?)",
+            sender.Value, recipient, recipient, sender.Value).
+        Order("timestamp").
+        Find(&messages).Error; err != nil {
+        log.Println("Error fetching messages:", err)
+        http.Error(w, "Failed to fetch messages", http.StatusInternalServerError)
+        return
+    }
 
-	json.NewEncoder(w).Encode(messages)
+    log.Printf("Fetched messages for %s and %s: %+v", sender.Value, recipient, messages)
+
+    // Return messages as JSON
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(messages)
+}
+
+
+
+// FetchUnreadMessagesHandler fetches unread messages for the recipient
+func FetchUnreadMessagesHandler(w http.ResponseWriter, r *http.Request) {
+    recipientCookie, err := r.Cookie("username")
+    if err != nil {
+        log.Println("Error fetching username cookie:", err)
+        http.Error(w, "User not authenticated", http.StatusUnauthorized)
+        return
+    }
+    recipient := recipientCookie.Value
+
+    sender := r.URL.Query().Get("sender")
+    if sender == "" {
+        http.Error(w, "Sender is required", http.StatusBadRequest)
+        return
+    }
+
+    var messages []Message
+    if err := forumDB.
+        Where("recipient = ? AND sender = ? AND read = ?", recipient, sender, false).
+        Order("timestamp").
+        Find(&messages).Error; err != nil {
+        log.Println("Error fetching unread messages:", err)
+        http.Error(w, "Failed to fetch messages", http.StatusInternalServerError)
+        return
+    }
+
+    // Mark messages as read
+    forumDB.Model(&Message{}).Where("recipient = ? AND sender = ?", recipient, sender).Update("read", true)
+
+    json.NewEncoder(w).Encode(messages)
 }

@@ -54,6 +54,8 @@ func goServer() {
 	http.Handle("/signup/", enableCORS(http.HandlerFunc(SignUpHandler)))
 	http.Handle("/", enableCORS(http.HandlerFunc(SignInHandler)))
 	http.Handle("/send-message", enableCORS(authMiddleware(http.HandlerFunc(SendMessageHandler))))
+	http.Handle("/get-messages", enableCORS(authMiddleware(http.HandlerFunc(GetMessagesHandler))))
+	
 	http.Handle("/signout/", enableCORS(http.HandlerFunc(SignOutHandler)))
 	//http.Handle("/forum/", enableCORS(authMiddleware(http.HandlerFunc(ForumHandler))))
 	http.Handle("/profile/", enableCORS(authMiddleware(http.HandlerFunc(profileHandler))))
