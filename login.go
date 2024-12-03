@@ -1,11 +1,9 @@
 package main
 
-//import "C"
-//
-
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"time"
 )
@@ -16,6 +14,7 @@ type User struct {
 	Username string `gorm:"unique"`
 	Email    string `gorm:"unique"`
 	Password string
+	//flag	 bool
 }
 
 // authMiddleware checks if the user is authenticated.
@@ -33,7 +32,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		t, _ := template.ParseFiles("login_or_register.dart")
+		t, _ := template.ParseFiles("signup.html")
 		t.Execute(w, nil)
 	} else if r.Method == "POST" {
 		username := r.FormValue("username")
@@ -58,12 +57,16 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 // SignInHandler handles user sign-in.
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("SignInHandler called")
+	log.Printf("Request method: %s", r.Method)
+
 	if r.Method == "GET" {
-		t, _ := template.ParseFiles("login_or_register.dart")
+		t, _ := template.ParseFiles("signin.html")
 		t.Execute(w, nil)
 	} else if r.Method == "POST" {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
+		log.Printf("Received username: %s, password: %s", username, password)
 
 		var user User
 		if err := forumDB.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
@@ -71,7 +74,9 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Create session if valid
 		sessionID := fmt.Sprintf("%d", time.Now().UnixNano())
+		log.Println("Login successful, setting session token")
 
 		http.SetCookie(w, &http.Cookie{
 			Name:  "session_token",
@@ -79,6 +84,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			Path:  "/",
 		})
 
+		// Set a cookie with session ID
 		http.SetCookie(w, &http.Cookie{
 			Name:    "session_id",
 			Value:   sessionID,
@@ -88,7 +94,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.SetCookie(w, &http.Cookie{
 			Name:    "username",
-			Value:   user.Username,
+			Value:   username,
 			Expires: time.Now().Add(24 * time.Hour),
 			Path:    "/",
 		})
@@ -128,29 +134,6 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-// ProfileHandler handles user profile.
-func ProfileHandler(w http.ResponseWriter, r *http.Request) {
-	usernameCookie, err1 := r.Cookie("username")
-	emailCookie, err2 := r.Cookie("email")
-
-	if err1 != nil || err2 != nil {
-		http.Redirect(w, r, "/", http.StatusFound)
-		return
-	}
-
-	data := struct {
-		Username string
-		Email    string
-	}{
-		Username: usernameCookie.Value,
-		Email:    emailCookie.Value,
-	}
-
-	t, _ := template.ParseFiles("profile.html")
-	t.Execute(w, data)
-}
-
-// EditProfileHandler renders the edit profile page.
 func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 	usernameCookie, err1 := r.Cookie("username")
 	emailCookie, err2 := r.Cookie("email")
@@ -175,44 +158,27 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t.Execute(w, data)
-
 }
 
-// UpdateProfileHandler updates user profile.
 func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
-	usernameCookie, err1 := r.Cookie("username")
-	emailCookie, err2 := r.Cookie("email")
-
-	if err1 != nil || err2 != nil {
-		http.Redirect(w, r, "/", http.StatusFound)
-		return
-	}
-
-	currentUsername := usernameCookie.Value
-	currentEmail := emailCookie.Value
+	currentUsername, _ := r.Cookie("username")
+	currentEmail, _ := r.Cookie("email")
 
 	newUsername := r.FormValue("username")
 	newEmail := r.FormValue("email")
 
 	var user User
-	if err := forumDB.Where("username = ? AND email = ?", currentUsername, currentEmail).First(&user).Error; err != nil {
+	if err := forumDB.Where("username = ? AND email = ?", currentUsername.Value, currentEmail.Value).First(&user).Error; err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
 
-	// Check if the new username or email already exists
-	var existingUser User
-	if err := forumDB.Where("username = ? OR email = ?", newUsername, newEmail).First(&existingUser).Error; err == nil && existingUser.ID != user.ID {
-		http.Error(w, "Username or email already in use. Please choose another.", http.StatusConflict)
-		return
-	}
-
-	// Update user information
+	// Update the user's username and email
 	user.Username = newUsername
 	user.Email = newEmail
 
@@ -221,7 +187,7 @@ func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Update cookies with new username and email
+	// Update cookies
 	http.SetCookie(w, &http.Cookie{
 		Name:    "username",
 		Value:   newUsername,
@@ -236,5 +202,5 @@ func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
 		Path:    "/",
 	})
 
-	http.Redirect(w, r, "/view/", http.StatusFound)
+	http.Redirect(w, r, "/profile/", http.StatusFound)
 }

@@ -4,11 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
+    <style>
+        button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: darkblue;
+        }
+    </style>
 </head>
 <body>
     <h1>User Profile</h1>
     <p>Welcome, {{.Username}}!</p>
     <p>Your email: {{.Email}}</p>
+    <!-- Link to edit profile -->
+    <a href="/edit-profile/">Edit Profile</a>
+    <!-- Link to sign out -->
     <a href="/signout/">Sign Out</a>
+    <!-- Button to go back to the main page -->
+    <button onclick="window.location.href='/'">Go to Main Page</button>
 </body>
 </html>
