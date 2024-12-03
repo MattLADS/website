@@ -58,7 +58,7 @@ func goServer() {
 	//http.Handle("/forum/", enableCORS(authMiddleware(http.HandlerFunc(ForumHandler))))
 	http.Handle("/profile/", enableCORS(authMiddleware(http.HandlerFunc(profileHandler))))
 	http.Handle("/topic/", enableCORS(authMiddleware(http.HandlerFunc(TopicHandler))))
-	//http.Handle("/new-topic/", enableCORS(authMiddleware(http.HandlerFunc(NewTopicHandler))))
+	http.Handle("/new-topic/", enableCORS(authMiddleware(http.HandlerFunc(NewTopicHandler))))
 	http.Handle("/new-comment/", enableCORS(authMiddleware(http.HandlerFunc(NewCommentHandler))))
 	http.Handle("/view/", enableCORS(authMiddleware(http.HandlerFunc(ViewHandler))))
 	http.Handle("/edit/", enableCORS(authMiddleware(http.HandlerFunc(EditHandler))))
@@ -67,7 +67,7 @@ func goServer() {
 	http.HandleFunc("/logout/", SignOutHandler)
 	//log.Println("Registered /forum/ route")
 	http.Handle("/forum/", enableCORS(http.HandlerFunc(ForumHandler)))
-	http.Handle("/new-topic/", enableCORS(http.HandlerFunc(NewTopicHandler)))
+
 	http.Handle("/fetch-users", enableCORS(authMiddleware(http.HandlerFunc(FetchUsersHandler))))
 	//http.HandleFunc("/testtopics", TestTopicsHandler)
 	//http.HandleFunc("/testtopics", enableCORS(http.HandlerFunc(TestTopicsHandler)))

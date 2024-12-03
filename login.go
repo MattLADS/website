@@ -15,6 +15,7 @@ type User struct {
 	ID       uint   `gorm:"primaryKey"`
 	Username string `gorm:"unique"`
 	Password string
+	Email 	string `gorm:"unique"`
 	//flag	 bool
 }
 
@@ -32,35 +33,98 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 }
 
 
+// // SignUpHandler handles user registration.
+// func SignUpHandler(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method == "GET" {
+// 		t, _ := template.ParseFiles("login_or_register.dart")
+// 		t.Execute(w, nil)
+// 	} else if r.Method == "POST" {
+// 		username := r.FormValue("username")
+// 		password := r.FormValue("password")
+// 
+// 		var existingUser User
+// 		if err := forumDB.Where("username = ?", username).First(&existingUser).Error; err == nil {
+// 			http.Error(w, "Username already exists. Please choose another one.", http.StatusConflict)
+// 			return
+// 		}
+// 
+// 		newUser := User{Username: username, Password: password}
+// 		if err := forumDB.Create(&newUser).Error; err != nil {
+// 			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
+// 			return
+// 		}
+// 
+// 		http.Redirect(w, r, "/", http.StatusFound)
+// 	}
+// }
+
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		t, _ := template.ParseFiles("signup.html")
-		t.Execute(w, nil)
-	} else if r.Method == "POST" {
-		username := r.FormValue("username")
-		password := r.FormValue("password")
+    if r.Method == http.MethodGet {
+        // Serve the sign-up page (HTML file)
+        t, err := template.ParseFiles("signup.html")
+        if err != nil {
+            log.Println("Error parsing signup.html:", err)
+            http.Error(w, "Internal server error", http.StatusInternalServerError)
+            return
+        }
+        t.Execute(w, nil)
+        return
+    }
 
-		var existingUser User
-		if err := forumDB.Where("username = ?", username).First(&existingUser).Error; err == nil {
-			http.Error(w, "Username already exists. Please choose another one.", http.StatusConflict)
-			return
-		}
+    if r.Method == http.MethodPost {
+        // Parse form data for sign-up
+        username := r.FormValue("username")
+        password := r.FormValue("password")
 
-		newUser := User{Username: username, Password: password}
-		if err := forumDB.Create(&newUser).Error; err != nil {
-			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
-			return
-		}
+        if username == "" || password == "" {
+            log.Println("Username or password missing during signup")
+            http.Error(w, "Username and password are required", http.StatusBadRequest)
+            return
+        }
 
-		http.Redirect(w, r, "/", http.StatusFound)
-	}
+        // Check if the username already exists
+        var existingUser User
+        if err := forumDB.Where("username = ?", username).First(&existingUser).Error; err == nil {
+            log.Println("Attempt to register an existing username:", username)
+            http.Error(w, "Username already exists", http.StatusConflict)
+            return
+        }
+
+        // Add the new user to the database
+        newUser := User{
+            Username: username,
+            Password: password, // In production, hash the password before storing it
+        }
+
+        if err := forumDB.Create(&newUser).Error; err != nil {
+            log.Println("Error saving new user to database:", err)
+            http.Error(w, "Failed to create user", http.StatusInternalServerError)
+            return
+        }
+
+        log.Println("New user registered successfully:", username)
+
+        // Automatically sign in the user after successful registration
+        http.SetCookie(w, &http.Cookie{
+            Name:    "username",
+            Value:   username,
+            Path:    "/",
+            Expires: time.Now().Add(24 * time.Hour),
+        })
+
+        // Redirect the user to the DMs or dashboard
+        http.Redirect(w, r, "/view/", http.StatusSeeOther)
+    }
 }
 
+
+// SignInHandler handles user sign-in.
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
     log.Println("SignInHandler called")
     log.Printf("Request method: %s", r.Method)
 
+    // Handle GET requests
     if r.Method == "GET" {
         log.Println("Handling GET request for SignInHandler")
         t, err := template.ParseFiles("signin.html")
@@ -73,6 +137,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    // Handle POST requests
     if r.Method == "POST" {
         // Log the raw request body for debugging
         bodyBytes, err := io.ReadAll(r.Body)
@@ -127,6 +192,8 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+
+
 // SignOutHandler handles user sign-out.
 func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
@@ -149,4 +216,115 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+// ProfileHandler handles user profile.
+func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+	usernameCookie, err1 := r.Cookie("username")
+	emailCookie, err2 := r.Cookie("email")
+
+	if err1 != nil || err2 != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	data := struct {
+		Username string
+		Email    string
+	}{
+		Username: usernameCookie.Value,
+		Email:    emailCookie.Value,
+	}
+
+	t, _ := template.ParseFiles("profile.html")
+	t.Execute(w, data)
+}
+
+// EditProfileHandler renders the edit profile page.
+func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
+	usernameCookie, err1 := r.Cookie("username")
+	emailCookie, err2 := r.Cookie("email")
+
+	if err1 != nil || err2 != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	data := struct {
+		Username string
+		Email    string
+	}{
+		Username: usernameCookie.Value,
+		Email:    emailCookie.Value,
+	}
+
+	t, err := template.ParseFiles("edit_profile.html")
+	if err != nil {
+		http.Error(w, "Error loading edit profile page", http.StatusInternalServerError)
+		return
+	}
+
+	t.Execute(w, data)
+
+}
+
+// UpdateProfileHandler updates user profile.
+func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	usernameCookie, err1 := r.Cookie("username")
+	emailCookie, err2 := r.Cookie("email")
+
+	if err1 != nil || err2 != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	currentUsername := usernameCookie.Value
+	currentEmail := emailCookie.Value
+
+	newUsername := r.FormValue("username")
+	newEmail := r.FormValue("email")
+
+	var user User
+	if err := forumDB.Where("username = ? AND email = ?", currentUsername, currentEmail).First(&user).Error; err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	// Check if the new username or email already exists
+	var existingUser User
+	if err := forumDB.Where("username = ? OR email = ?", newUsername, newEmail).First(&existingUser).Error; err == nil && existingUser.ID != user.ID {
+		http.Error(w, "Username or email already in use. Please choose another.", http.StatusConflict)
+		return
+	}
+
+	// Update user information
+	user.Username = newUsername
+	user.Email = newEmail
+
+	if err := forumDB.Save(&user).Error; err != nil {
+		http.Error(w, "Failed to update profile", http.StatusInternalServerError)
+		return
+	}
+
+	// Update cookies with new username and email
+	http.SetCookie(w, &http.Cookie{
+		Name:    "username",
+		Value:   newUsername,
+		Expires: time.Now().Add(24 * time.Hour),
+		Path:    "/",
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "email",
+		Value:   newEmail,
+		Expires: time.Now().Add(24 * time.Hour),
+		Path:    "/",
+	})
+
+	http.Redirect(w, r, "/view/", http.StatusFound)
 }
