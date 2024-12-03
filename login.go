@@ -1,11 +1,13 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"time"
+	"io"
+	"bytes"
 )
 
 // User represents a user with a unique ID, username, and password.
@@ -16,17 +18,19 @@ type User struct {
 	//flag	 bool
 }
 
-// authMiddleware checks if the user is authenticated.
 func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("session_token")
-		if err != nil || cookie.Value != "authenticated" {
-			http.Redirect(w, r, "/", http.StatusFound) // Redirect to sign-in if not authenticated.
-			return
-		}
-		next(w, r)
-	}
+    return func(w http.ResponseWriter, r *http.Request) {
+        cookie, err := r.Cookie("username")
+        if err != nil || cookie.Value == "" {
+            log.Println("Unauthorized access, redirecting to sign-in")
+            http.Redirect(w, r, "/signin/", http.StatusFound)
+            return
+        }
+        log.Println("Middleware passed, username cookie:", cookie.Value)
+        next(w, r)
+    }
 }
+
 
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
@@ -53,52 +57,74 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// SignInHandler handles user sign-in.
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("SignInHandler called")
-	log.Printf("Request method: %s", r.Method)
+    log.Println("SignInHandler called")
+    log.Printf("Request method: %s", r.Method)
 
-	if r.Method == "GET" {
-		t, _ := template.ParseFiles("signin.html")
-		t.Execute(w, nil)
-	} else if r.Method == "POST" {
-		username := r.FormValue("username")
-		password := r.FormValue("password")
-		log.Printf("Received username: %s, password: %s", username, password)
+    if r.Method == "GET" {
+        log.Println("Handling GET request for SignInHandler")
+        t, err := template.ParseFiles("signin.html")
+        if err != nil {
+            log.Println("Error parsing signin.html:", err)
+            http.Error(w, "Internal server error", http.StatusInternalServerError)
+            return
+        }
+        t.Execute(w, nil)
+        return
+    }
 
-		var user User
-		if err := forumDB.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
-			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
-			return
-		}
+    if r.Method == "POST" {
+        // Log the raw request body for debugging
+        bodyBytes, err := io.ReadAll(r.Body)
+        if err != nil {
+            log.Println("Error reading request body:", err)
+        } else {
+            log.Println("Raw Request Body:", string(bodyBytes))
+        }
+        r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes)) // Reset the body so it can be re-read
 
-		// Create session if valid
-		sessionID := fmt.Sprintf("%d", time.Now().UnixNano())
-		log.Println("Login successful, setting session token")
+        // Parse the form data
+        if err := r.ParseForm(); err != nil {
+            log.Println("Error parsing form data:", err)
+            http.Error(w, "Invalid form submission", http.StatusBadRequest)
+            return
+        }
 
-		http.SetCookie(w, &http.Cookie{
-			Name:  "session_token",
-			Value: "authenticated",
-			Path:  "/",
-		})
+        username := r.FormValue("username")
+        password := r.FormValue("password")
+        log.Printf("Received username: '%s', password: '%s'", username, password)
 
-		// Set a cookie with session ID
-		http.SetCookie(w, &http.Cookie{
-			Name:    "session_id",
-			Value:   sessionID,
-			Expires: time.Now().Add(24 * time.Hour),
-			Path:    "/",
-		})
+        if username == "" || password == "" {
+            log.Println("Empty username or password")
+            http.Error(w, "Username and password are required", http.StatusBadRequest)
+            return
+        }
 
-		http.SetCookie(w, &http.Cookie{
-			Name:    "username",
-			Value:   username,
-			Expires: time.Now().Add(24 * time.Hour),
-			Path:    "/",
-		})
+        var user User
+        if err := forumDB.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
+            log.Println("Invalid credentials for username:", username)
+            http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+            return
+        }
 
-		http.Redirect(w, r, "/view/", http.StatusFound)
-	}
+        log.Println("Login successful, setting cookies")
+
+        http.SetCookie(w, &http.Cookie{
+            Name:  "session_token",
+            Value: "authenticated",
+            Path:  "/",
+        })
+
+        http.SetCookie(w, &http.Cookie{
+            Name:    "username",
+            Value:   username,
+            Expires: time.Now().Add(24 * time.Hour),
+            Path:    "/",
+        })
+
+        log.Println("Set session_token and username cookies")
+        http.Redirect(w, r, "/view/", http.StatusFound)
+    }
 }
 
 // SignOutHandler handles user sign-out.

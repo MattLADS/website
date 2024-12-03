@@ -41,7 +41,7 @@ func InitializeForumDB() {
 	forumDB.Exec("PRAGMA foreign_keys = ON;")
 
 	// Migrate the User, Topic, and Comment tables.
-	forumDB.AutoMigrate(&User{}, &Topic{}, &Comment{})
+	forumDB.AutoMigrate(&User{}, &Topic{}, &Comment{}, &Message{})
 }
 
 // ForumHandler serves the forum page with a list of topics.
