@@ -82,6 +82,10 @@ func goServer() {
 	http.Handle("/assignments/", enableCORS(authMiddleware(http.HandlerFunc(ListAssignmentsHandler))))
 	http.Handle("/delete-assignment/", enableCORS(authMiddleware(http.HandlerFunc(DeleteAssignmentHandler))))
 
+	// Route for Password Reset
+	http.Handle("/forgot-password/", enableCORS(http.HandlerFunc(ForgotPasswordHandler)))
+	http.Handle("/reset-password/", enableCORS(http.HandlerFunc(ResetPasswordHandler)))
+
 	// Start the HTTP server on port 8080.
 	log.Println("Starting server on :8080")
 	err := http.ListenAndServe(":8080", nil)

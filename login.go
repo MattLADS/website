@@ -1,11 +1,14 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"html/template"
 	"log"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -47,6 +50,20 @@ func validateEmailDomain(email string) error {
 	return nil
 }
 
+// validatePassword checks if the password meets the specified requirements.
+func validatePassword(password string) error {
+	if len(password) < 8 {
+		return fmt.Errorf("password must be at least 8 characters long")
+	}
+	if !regexp.MustCompile(`[A-Z]`).MatchString(password) {
+		return fmt.Errorf("password must contain at least one uppercase letter")
+	}
+	if !regexp.MustCompile(`[!@#$%^&*(),.?":{}|<>]`).MatchString(password) {
+		return fmt.Errorf("password must contain at least one special character")
+	}
+	return nil
+}
+
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -76,6 +93,8 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 			// Validate the email domain
 			if err := validateEmailDomain(email); err != nil {
 				errorMessage = "Invalid email address."
+			} else if err := validatePassword(password); err != nil {
+				errorMessage = err.Error()
 			} else {
 				// Check if the username or email already exists
 				var existingUser User
@@ -316,4 +335,127 @@ func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	http.Redirect(w, r, "/profile/", http.StatusFound)
+}
+
+// ForgotPasswordHandler serves the "Forgot Password" page.
+func ForgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		tmpl, err := template.ParseFiles("forgot_password.html")
+		if err != nil {
+			http.Error(w, "Error loading forgot password page", http.StatusInternalServerError)
+			return
+		}
+		tmpl.Execute(w, nil)
+	} else if r.Method == http.MethodPost {
+		email := r.FormValue("email")
+		var user User
+		err := forumDB.Where("email = ?", email).First(&user).Error
+		if err != nil {
+			tmpl, _ := template.ParseFiles("forgot_password.html")
+			tmpl.Execute(w, struct {
+				ErrorMessage   string
+				SuccessMessage string
+			}{
+				ErrorMessage:   "Invalid email address.",
+				SuccessMessage: "",
+			})
+			return
+		}
+
+		// Generate a reset token
+		token := generateResetToken()
+
+		// Store the token (this can be done in DB or temporary storage)
+		resetTokens[email] = token
+
+		// Log the simulated reset link for debugging
+		log.Printf("Password reset link for %s: http://localhost:8080/reset-password/?token=%s", email, token)
+
+		// Pass success message to the template
+		tmpl, _ := template.ParseFiles("forgot_password.html")
+		tmpl.Execute(w, struct {
+			ErrorMessage   string
+			SuccessMessage string
+		}{
+			ErrorMessage:   "",
+			SuccessMessage: "Sent you an email with a link to reset your password.",
+		})
+	}
+}
+
+// ResetPasswordHandler handles the password reset.
+func ResetPasswordHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		token := r.URL.Query().Get("token")
+		if !isValidResetToken(token) {
+			http.Error(w, "Invalid or expired reset token", http.StatusBadRequest)
+			return
+		}
+
+		tmpl, _ := template.ParseFiles("reset_password.html")
+		tmpl.Execute(w, nil)
+	} else if r.Method == http.MethodPost {
+		token := r.FormValue("token")
+		newPassword := r.FormValue("password")
+
+		if !isValidResetToken(token) {
+			http.Error(w, "Invalid or expired reset token", http.StatusBadRequest)
+			return
+		}
+
+		// Validate the new password
+		if err := validatePassword(newPassword); err != nil {
+			tmpl, _ := template.ParseFiles("reset_password.html")
+			tmpl.Execute(w, struct{ ErrorMessage string }{ErrorMessage: err.Error()})
+			return
+		}
+
+		// Find the associated email and user
+		email := getEmailByToken(token)
+		var user User
+		forumDB.Where("email = ?", email).First(&user)
+
+		// Check if the new password is the same as the old one
+		if user.Password == newPassword {
+			tmpl, _ := template.ParseFiles("reset_password.html")
+			tmpl.Execute(w, struct{ ErrorMessage string }{ErrorMessage: "New password cannot be the same as the old password."})
+			return
+		}
+
+		// Update the password
+		user.Password = newPassword
+		forumDB.Save(&user)
+
+		// Invalidate the reset token
+		delete(resetTokens, email)
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}
+
+// Helper functions
+var resetTokens = map[string]string{}
+
+func generateResetToken() string {
+	bytes := make([]byte, 16)
+	rand.Read(bytes)
+	return hex.EncodeToString(bytes)
+}
+
+func isValidResetToken(token string) bool {
+	for _, v := range resetTokens {
+		if v == token {
+			return true
+		}
+	}
+	return false
+}
+
+func getEmailByToken(token string) string {
+	for email, t := range resetTokens {
+		if t == token {
+			return email
+		}
+	}
+	return ""
 }

@@ -11,6 +11,11 @@
             font-size: 14px;
             margin-bottom: 10px;
         }
+        .password-requirements {
+            font-size: 12px;
+            color: gray;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -47,6 +52,14 @@
         <div>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" placeholder="Choose a password" required>
+            <div class="password-requirements">
+                Password must:
+                <ul>
+                    <li>Be at least 8 characters long</li>
+                    <li>Contain at least 1 uppercase letter</li>
+                    <li>Contain at least 1 special character (e.g., @, #, $)</li>
+                </ul>
+            </div>
         </div>
 
         <button type="submit">Sign Up</button>
