@@ -5,32 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Sign Up</h1>
+    {{if .ErrorMessage}}
+        <div class="error">{{.ErrorMessage}}</div>
+    {{end}}
     <form action="/signup/" method="post" autocomplete="off">
         <!-- First Name Field -->
         <div>
             <label for="first_name">First Name:</label>
-            <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required>
+            <input type="text" id="first_name" name="first_name" value="{{.FirstName}}" placeholder="Enter your first name" required>
         </div>
 
         <!-- Last Name Field -->
         <div>
             <label for="last_name">Last Name:</label>
-            <input type="text" id="last_name" name="last_name" placeholder="Enter your last name" required>
+            <input type="text" id="last_name" name="last_name" value="{{.LastName}}" placeholder="Enter your last name" required>
         </div>
 
         <!-- Username Field -->
         <div>
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" placeholder="Choose a username" required>
+            <input type="text" id="username" name="username" value="{{.Username}}" placeholder="Choose a username" required>
         </div>
 
         <!-- Email Field -->
         <div>
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <input type="email" id="email" name="email" value="{{.Email}}" placeholder="Enter your email" required>
         </div>
 
         <!-- Password Field -->

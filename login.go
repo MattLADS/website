@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -31,24 +33,87 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// validateEmailDomain checks if the email's domain has valid MX records.
+func validateEmailDomain(email string) error {
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return fmt.Errorf("invalid email format")
+	}
+
+	_, err := net.LookupMX(parts[1])
+	if err != nil {
+		return fmt.Errorf("invalid email domain: %v", err)
+	}
+	return nil
+}
+
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		t, _ := template.ParseFiles("signup.html")
+		t, err := template.ParseFiles("signup.html")
+		if err != nil {
+			log.Println("Error parsing signup.html:", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 		t.Execute(w, nil)
-	} else if r.Method == "POST" {
+		return
+	}
+
+	if r.Method == "POST" {
 		firstName := r.FormValue("first_name")
 		lastName := r.FormValue("last_name")
 		username := r.FormValue("username")
 		email := r.FormValue("email")
 		password := r.FormValue("password")
 
-		var existingUser User
-		if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
-			http.Error(w, "Username or email already exists. Please choose another one.", http.StatusConflict)
+		errorMessage := ""
+
+		// Check for empty fields
+		if firstName == "" || lastName == "" || username == "" || email == "" || password == "" {
+			errorMessage = "All fields are required."
+		} else {
+			// Validate the email domain
+			if err := validateEmailDomain(email); err != nil {
+				errorMessage = "Invalid email address."
+			} else {
+				// Check if the username or email already exists
+				var existingUser User
+				if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
+					errorMessage = "Username or email already exists. Please choose another."
+				}
+			}
+		}
+
+		// If there is an error, re-render the signup page with the error message
+		if errorMessage != "" {
+			t, err := template.ParseFiles("signup.html")
+			if err != nil {
+				log.Println("Error parsing signup.html:", err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				return
+			}
+
+			// Pass the error message to the template
+			data := struct {
+				ErrorMessage string
+				FirstName    string
+				LastName     string
+				Username     string
+				Email        string
+			}{
+				ErrorMessage: errorMessage,
+				FirstName:    firstName,
+				LastName:     lastName,
+				Username:     username,
+				Email:        email,
+			}
+
+			t.Execute(w, data)
 			return
 		}
 
+		// If no errors, create the new user
 		newUser := User{
 			FirstName: firstName,
 			LastName:  lastName,
