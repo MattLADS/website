@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/smtp"
 	"regexp"
 	"strings"
 	"time"
@@ -23,6 +24,13 @@ type User struct {
 	LastName  string
 	//flag	 bool
 }
+
+const (
+	fromEmail    = "klads723@gmail.com"  // Your Gmail address
+	fromPassword = "yvdm ramz qvjt tvdl" // App password generated earlier
+	smtpHost     = "smtp.gmail.com"
+	smtpPort     = "587"
+)
 
 // authMiddleware checks if the user is authenticated.
 func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
@@ -458,7 +466,22 @@ func ForgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
 		// Store the token (this can be done in DB or temporary storage)
 		resetTokens[email] = token
 
-		// Log the simulated reset link for debugging
+		// Compose the email
+		to := []string{email}
+		subject := "Password Reset Request"
+		body := fmt.Sprintf("Click the link below to reset your password:\n\nhttp://localhost:8080/reset-password/?token=%s", token)
+		message := fmt.Sprintf("Subject: %s\n\n%s", subject, body)
+
+		// Send the email
+		auth := smtp.PlainAuth("", fromEmail, fromPassword, smtpHost)
+		err = smtp.SendMail(smtpHost+":"+smtpPort, auth, fromEmail, to, []byte(message))
+		if err != nil {
+			log.Printf("Failed to send email: %v", err)
+			http.Error(w, "Failed to send reset email.", http.StatusInternalServerError)
+			return
+		}
+
+		// Log for debugging
 		log.Printf("Password reset link for %s: http://localhost:8080/reset-password/?token=%s", email, token)
 
 		// Pass success message to the template
