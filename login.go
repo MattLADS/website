@@ -12,9 +12,11 @@ import (
 
 // User represents a user with a unique ID, username, and password.
 type User struct {
-	ID       uint   `gorm:"primaryKey"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	ID          uint   `gorm:"primaryKey"`
+	Username    string `json:"username"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	UserContext string `json:"user_context"`
 }
 
 // authMiddleware checks if the user is authenticated.
@@ -65,7 +67,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Set-Cookie header for username: %s", request.Username)
 
 		//create new user
-		newUser := User{Username: request.Username, Password: request.Password}
+		newUser := User{Username: request.Username, Password: request.Password, UserContext: ""}
 		if err := forumDB.Create(&newUser).Error; err != nil {
 			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
 			return
