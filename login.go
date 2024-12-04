@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -29,22 +31,58 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+
+// validateEmailDomain checks if the email's domain has valid MX records.
+func validateEmailDomain(email string) error {
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return fmt.Errorf("invalid email format")
+	}
+
+	_, err := net.LookupMX(parts[1])
+	if err != nil {
+		return fmt.Errorf("invalid email domain: %v", err)
+	}
+	return nil
+}
+
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		t, _ := template.ParseFiles("signup.html")
+		t, err := template.ParseFiles("signup.html")
+		if err != nil {
+			log.Println("Error parsing signup.html:", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 		t.Execute(w, nil)
-	} else if r.Method == "POST" {
+		return
+	}
+
+	if r.Method == "POST" {
 		username := r.FormValue("username")
 		email := r.FormValue("email")
 		password := r.FormValue("password")
 
-		var existingUser User
-		if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
-			http.Error(w, "Username or email already exists. Please choose another one.", http.StatusConflict)
+		if username == "" || email == "" || password == "" {
+			http.Error(w, "All fields are required.", http.StatusBadRequest)
 			return
 		}
 
+		// Validate the email domain
+		if err := validateEmailDomain(email); err != nil {
+			http.Error(w, "Invalid email address.", http.StatusBadRequest)
+			return
+		}
+
+		// Check if the username or email already exists
+		var existingUser User
+		if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
+			http.Error(w, "Username or email already exists. Please choose another.", http.StatusConflict)
+			return
+		}
+
+		// Create a new user
 		newUser := User{Username: username, Email: email, Password: password}
 		if err := forumDB.Create(&newUser).Error; err != nil {
 			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
@@ -54,6 +92,31 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
+// // SignUpHandler handles user registration.
+// func SignUpHandler(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method == "GET" {
+// 		t, _ := template.ParseFiles("signup.html")
+// 		t.Execute(w, nil)
+// 	} else if r.Method == "POST" {
+// 		username := r.FormValue("username")
+// 		email := r.FormValue("email")
+// 		password := r.FormValue("password")
+// 
+// 		var existingUser User
+// 		if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
+// 			http.Error(w, "Username or email already exists. Please choose another one.", http.StatusConflict)
+// 			return
+// 		}
+// 
+// 		newUser := User{Username: username, Email: email, Password: password}
+// 		if err := forumDB.Create(&newUser).Error; err != nil {
+// 			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
+// 			return
+// 		}
+// 
+// 		http.Redirect(w, r, "/", http.StatusFound)
+// 	}
+// }
 
 // SignInHandler handles user sign-in.
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
