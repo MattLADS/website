@@ -2,7 +2,7 @@
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  static const String baseUrl = 'http://localhost:8080';
+  static const String baseUrl = 'https://5ss3q5kd-8080.usw3.devtunnels.ms';
 
   // Login with backend
   Future<void> login(String username, String password) async {

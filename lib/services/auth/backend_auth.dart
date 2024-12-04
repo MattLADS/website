@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 class BackendAuthService {
-  static const String baseUrl = 'http://localhost:8080';
+  static const String baseUrl = 'https://5ss3q5kd-8080.usw3.devtunnels.ms';
 
   // Register with backend
   Future<bool> register(String username, String password) async {

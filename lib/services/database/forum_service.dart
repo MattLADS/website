@@ -7,7 +7,7 @@ import 'package:http/browser_client.dart' as http;
 
 
 class ForumService {
-  static const String baseUrl = 'http://localhost:8080';
+  static const String baseUrl = 'https://5ss3q5kd-8080.usw3.devtunnels.ms';
 
   Future<List<Map<String, dynamic>>> fetchTopics() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
