@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum</title>
+    <title>Basic Forum Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,9 +25,8 @@
             border-radius: 8px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
-        h1, h2 {
+        h1 {
             font-size: 24px;
-            margin-bottom: 10px;
         }
         .new-topic {
             margin-bottom: 20px;
@@ -54,23 +53,15 @@
             list-style-type: none;
             padding: 0;
         }
-        .topic {
+        .topic-list li {
             padding: 15px;
             border-bottom: 1px solid #ccc;
         }
-        .topic h2 {
-            margin: 0;
-            font-size: 18px;
-        }
-        .topic p {
-            margin: 5px 0;
-            color: #666;
-        }
-        .topic a {
+        .topic-list li a {
             text-decoration: none;
             color: #333;
         }
-        .topic a:hover {
+        .topic-list li a:hover {
             color: #4CAF50;
         }
     </style>
@@ -91,20 +82,14 @@
             <button type="submit">Post</button>
         </form>
     </div>
-
     <h2>Recent Topics</h2>
-    <div class="topic-list">
-        {{range .Topics}}
-        <div class="topic">
-            <h2>{{.Title}}</h2>
-            <p>By: {{.UserFullName}} ({{.Username}})</p>
-            <p>{{.Content}}</p>
-            <a href="/topic?title={{.Title}}">View Topic</a>
-        </div>
+    <ul class="topic-list">
+        {{range .}}
+        <li><a href="/topic?title={{.Title}}">{{.Username}}: {{.Title}}</a></li>
         {{else}}
-        <p>No topics available</p>
+        <li>No topics available</li>
         {{end}}
-    </div>
+    </ul>
 </div>
 
 </body>
