@@ -26,8 +26,8 @@ type User struct {
 }
 
 const (
-	fromEmail    = "klads723@gmail.com"  // Your Gmail address
-	fromPassword = "yvdm ramz qvjt tvdl" // App password generated earlier
+	fromEmail    = "klads723@gmail.com" // Your Gmail address
+	fromPassword = "yvdmramzqvjttvdl"   // App password generated earlier
 	smtpHost     = "smtp.gmail.com"
 	smtpPort     = "587"
 )
@@ -74,93 +74,93 @@ func validatePassword(password string) error {
 
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "GET" {
-        t, err := template.ParseFiles("signup.html")
-        if err != nil {
-            log.Println("Error parsing signup.html:", err)
-            http.Error(w, "Internal server error", http.StatusInternalServerError)
-            return
-        }
-        t.Execute(w, nil)
-        return
-    }
+	if r.Method == "GET" {
+		t, err := template.ParseFiles("signup.html")
+		if err != nil {
+			log.Println("Error parsing signup.html:", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		t.Execute(w, nil)
+		return
+	}
 
-    if r.Method == "POST" {
-        firstName := r.FormValue("first_name")
-        lastName := r.FormValue("last_name")
-        username := r.FormValue("username")
-        email := r.FormValue("email")
-        password := r.FormValue("password")
-        confirmPassword := r.FormValue("confirm_password")
+	if r.Method == "POST" {
+		firstName := r.FormValue("first_name")
+		lastName := r.FormValue("last_name")
+		username := r.FormValue("username")
+		email := r.FormValue("email")
+		password := r.FormValue("password")
+		confirmPassword := r.FormValue("confirm_password")
 
-        errorMessage := ""
+		errorMessage := ""
 
-        // Check if passwords match
-        if password != confirmPassword {
-            errorMessage = "Passwords do not match."
-        }
+		// Check if passwords match
+		if password != confirmPassword {
+			errorMessage = "Passwords do not match."
+		}
 
-        // Check for empty fields
-        if firstName == "" || lastName == "" || username == "" || email == "" || password == "" || confirmPassword == "" {
-            errorMessage = "All fields are required."
-        } else if errorMessage == "" {
-            // Validate the email domain
-            if err := validateEmailDomain(email); err != nil {
-                errorMessage = "Invalid email address."
-            } else if err := validatePassword(password); err != nil {
-                errorMessage = err.Error()
-            } else {
-                // Check if the username or email already exists
-                var existingUser User
-                if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
-                    errorMessage = "Username or email already exists. Please choose another."
-                }
-            }
-        }
+		// Check for empty fields
+		if firstName == "" || lastName == "" || username == "" || email == "" || password == "" || confirmPassword == "" {
+			errorMessage = "All fields are required."
+		} else if errorMessage == "" {
+			// Validate the email domain
+			if err := validateEmailDomain(email); err != nil {
+				errorMessage = "Invalid email address."
+			} else if err := validatePassword(password); err != nil {
+				errorMessage = err.Error()
+			} else {
+				// Check if the username or email already exists
+				var existingUser User
+				if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
+					errorMessage = "Username or email already exists. Please choose another."
+				}
+			}
+		}
 
-        // If there is an error, re-render the signup page with the error message
-        if errorMessage != "" {
-            t, err := template.ParseFiles("signup.html")
-            if err != nil {
-                log.Println("Error parsing signup.html:", err)
-                http.Error(w, "Internal server error", http.StatusInternalServerError)
-                return
-            }
+		// If there is an error, re-render the signup page with the error message
+		if errorMessage != "" {
+			t, err := template.ParseFiles("signup.html")
+			if err != nil {
+				log.Println("Error parsing signup.html:", err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				return
+			}
 
-            // Pass the error message to the template
-            data := struct {
-                ErrorMessage string
-                FirstName    string
-                LastName     string
-                Username     string
-                Email        string
-            }{
-                ErrorMessage: errorMessage,
-                FirstName:    firstName,
-                LastName:     lastName,
-                Username:     username,
-                Email:        email,
-            }
+			// Pass the error message to the template
+			data := struct {
+				ErrorMessage string
+				FirstName    string
+				LastName     string
+				Username     string
+				Email        string
+			}{
+				ErrorMessage: errorMessage,
+				FirstName:    firstName,
+				LastName:     lastName,
+				Username:     username,
+				Email:        email,
+			}
 
-            t.Execute(w, data)
-            return
-        }
+			t.Execute(w, data)
+			return
+		}
 
-        // If no errors, create the new user
-        newUser := User{
-            FirstName: firstName,
-            LastName:  lastName,
-            Username:  username,
-            Email:     email,
-            Password:  password,
-        }
-        if err := forumDB.Create(&newUser).Error; err != nil {
-            http.Error(w, "Failed to create user.", http.StatusInternalServerError)
-            return
-        }
+		// If no errors, create the new user
+		newUser := User{
+			FirstName: firstName,
+			LastName:  lastName,
+			Username:  username,
+			Email:     email,
+			Password:  password,
+		}
+		if err := forumDB.Create(&newUser).Error; err != nil {
+			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
+			return
+		}
 
-        http.Redirect(w, r, "/", http.StatusFound)
-    }
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
 }
 
 // func SignUpHandler(w http.ResponseWriter, r *http.Request) {
@@ -174,16 +174,16 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 // 		t.Execute(w, nil)
 // 		return
 // 	}
-// 
+//
 // 	if r.Method == "POST" {
 // 		firstName := r.FormValue("first_name")
 // 		lastName := r.FormValue("last_name")
 // 		username := r.FormValue("username")
 // 		email := r.FormValue("email")
 // 		password := r.FormValue("password")
-// 
+//
 // 		errorMessage := ""
-// 
+//
 // 		// Check for empty fields
 // 		if firstName == "" || lastName == "" || username == "" || email == "" || password == "" {
 // 			errorMessage = "All fields are required."
@@ -201,7 +201,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 // 				}
 // 			}
 // 		}
-// 
+//
 // 		// If there is an error, re-render the signup page with the error message
 // 		if errorMessage != "" {
 // 			t, err := template.ParseFiles("signup.html")
@@ -210,7 +210,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 // 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 // 				return
 // 			}
-// 
+//
 // 			// Pass the error message to the template
 // 			data := struct {
 // 				ErrorMessage string
@@ -225,11 +225,11 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 // 				Username:     username,
 // 				Email:        email,
 // 			}
-// 
+//
 // 			t.Execute(w, data)
 // 			return
 // 		}
-// 
+//
 // 		// If no errors, create the new user
 // 		newUser := User{
 // 			FirstName: firstName,
@@ -242,7 +242,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 // 			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
 // 			return
 // 		}
-// 
+//
 // 		http.Redirect(w, r, "/", http.StatusFound)
 // 	}
 // }
@@ -501,48 +501,109 @@ func ResetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		token := r.URL.Query().Get("token")
 		if !isValidResetToken(token) {
-			http.Error(w, "Invalid or expired reset token", http.StatusBadRequest)
+			tmpl, _ := template.ParseFiles("reset_password.html")
+			tmpl.Execute(w, struct {
+				ErrorMessage string
+				Token        string
+			}{
+				ErrorMessage: "Invalid or expired reset token.",
+				Token:        "",
+			})
 			return
 		}
 
 		tmpl, _ := template.ParseFiles("reset_password.html")
-		tmpl.Execute(w, nil)
+		tmpl.Execute(w, struct {
+			ErrorMessage string
+			Token        string
+		}{
+			ErrorMessage: "",
+			Token:        token,
+		})
 	} else if r.Method == http.MethodPost {
 		token := r.FormValue("token")
 		newPassword := r.FormValue("password")
 
 		if !isValidResetToken(token) {
-			http.Error(w, "Invalid or expired reset token", http.StatusBadRequest)
+			tmpl, _ := template.ParseFiles("reset_password.html")
+			tmpl.Execute(w, struct {
+				ErrorMessage string
+				Token        string
+			}{
+				ErrorMessage: "Invalid or expired reset token.",
+				Token:        token,
+			})
 			return
 		}
 
 		// Validate the new password
 		if err := validatePassword(newPassword); err != nil {
 			tmpl, _ := template.ParseFiles("reset_password.html")
-			tmpl.Execute(w, struct{ ErrorMessage string }{ErrorMessage: err.Error()})
+			tmpl.Execute(w, struct {
+				ErrorMessage string
+				Token        string
+			}{
+				ErrorMessage: err.Error(),
+				Token:        token,
+			})
 			return
 		}
 
 		// Find the associated email and user
 		email := getEmailByToken(token)
 		var user User
-		forumDB.Where("email = ?", email).First(&user)
+		if err := forumDB.Where("email = ?", email).First(&user).Error; err != nil {
+			tmpl, _ := template.ParseFiles("reset_password.html")
+			tmpl.Execute(w, struct {
+				ErrorMessage string
+				Token        string
+			}{
+				ErrorMessage: "User not found.",
+				Token:        token,
+			})
+			return
+		}
 
 		// Check if the new password is the same as the old one
 		if user.Password == newPassword {
 			tmpl, _ := template.ParseFiles("reset_password.html")
-			tmpl.Execute(w, struct{ ErrorMessage string }{ErrorMessage: "New password cannot be the same as the old password."})
+			tmpl.Execute(w, struct {
+				ErrorMessage string
+				Token        string
+			}{
+				ErrorMessage: "New password cannot be the same as the old password.",
+				Token:        token,
+			})
 			return
 		}
 
 		// Update the password
 		user.Password = newPassword
-		forumDB.Save(&user)
+		if err := forumDB.Save(&user).Error; err != nil {
+			tmpl, _ := template.ParseFiles("reset_password.html")
+			tmpl.Execute(w, struct {
+				ErrorMessage string
+				Token        string
+			}{
+				ErrorMessage: "Failed to update the password. Please try again later.",
+				Token:        token,
+			})
+			return
+		}
 
 		// Invalidate the reset token
 		delete(resetTokens, email)
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		tmpl, _ := template.ParseFiles("reset_password.html")
+		tmpl.Execute(w, struct {
+			ErrorMessage   string
+			SuccessMessage string
+			Token          string
+		}{
+			ErrorMessage:   "",
+			SuccessMessage: "Password successfully updated. You can now sign in.",
+			Token:          "",
+		})
 	}
 }
 
