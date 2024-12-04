@@ -66,88 +66,178 @@ func validatePassword(password string) error {
 
 // SignUpHandler handles user registration.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		t, err := template.ParseFiles("signup.html")
-		if err != nil {
-			log.Println("Error parsing signup.html:", err)
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-		t.Execute(w, nil)
-		return
-	}
+    if r.Method == "GET" {
+        t, err := template.ParseFiles("signup.html")
+        if err != nil {
+            log.Println("Error parsing signup.html:", err)
+            http.Error(w, "Internal server error", http.StatusInternalServerError)
+            return
+        }
+        t.Execute(w, nil)
+        return
+    }
 
-	if r.Method == "POST" {
-		firstName := r.FormValue("first_name")
-		lastName := r.FormValue("last_name")
-		username := r.FormValue("username")
-		email := r.FormValue("email")
-		password := r.FormValue("password")
+    if r.Method == "POST" {
+        firstName := r.FormValue("first_name")
+        lastName := r.FormValue("last_name")
+        username := r.FormValue("username")
+        email := r.FormValue("email")
+        password := r.FormValue("password")
+        confirmPassword := r.FormValue("confirm_password")
 
-		errorMessage := ""
+        errorMessage := ""
 
-		// Check for empty fields
-		if firstName == "" || lastName == "" || username == "" || email == "" || password == "" {
-			errorMessage = "All fields are required."
-		} else {
-			// Validate the email domain
-			if err := validateEmailDomain(email); err != nil {
-				errorMessage = "Invalid email address."
-			} else if err := validatePassword(password); err != nil {
-				errorMessage = err.Error()
-			} else {
-				// Check if the username or email already exists
-				var existingUser User
-				if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
-					errorMessage = "Username or email already exists. Please choose another."
-				}
-			}
-		}
+        // Check if passwords match
+        if password != confirmPassword {
+            errorMessage = "Passwords do not match."
+        }
 
-		// If there is an error, re-render the signup page with the error message
-		if errorMessage != "" {
-			t, err := template.ParseFiles("signup.html")
-			if err != nil {
-				log.Println("Error parsing signup.html:", err)
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-				return
-			}
+        // Check for empty fields
+        if firstName == "" || lastName == "" || username == "" || email == "" || password == "" || confirmPassword == "" {
+            errorMessage = "All fields are required."
+        } else if errorMessage == "" {
+            // Validate the email domain
+            if err := validateEmailDomain(email); err != nil {
+                errorMessage = "Invalid email address."
+            } else if err := validatePassword(password); err != nil {
+                errorMessage = err.Error()
+            } else {
+                // Check if the username or email already exists
+                var existingUser User
+                if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
+                    errorMessage = "Username or email already exists. Please choose another."
+                }
+            }
+        }
 
-			// Pass the error message to the template
-			data := struct {
-				ErrorMessage string
-				FirstName    string
-				LastName     string
-				Username     string
-				Email        string
-			}{
-				ErrorMessage: errorMessage,
-				FirstName:    firstName,
-				LastName:     lastName,
-				Username:     username,
-				Email:        email,
-			}
+        // If there is an error, re-render the signup page with the error message
+        if errorMessage != "" {
+            t, err := template.ParseFiles("signup.html")
+            if err != nil {
+                log.Println("Error parsing signup.html:", err)
+                http.Error(w, "Internal server error", http.StatusInternalServerError)
+                return
+            }
 
-			t.Execute(w, data)
-			return
-		}
+            // Pass the error message to the template
+            data := struct {
+                ErrorMessage string
+                FirstName    string
+                LastName     string
+                Username     string
+                Email        string
+            }{
+                ErrorMessage: errorMessage,
+                FirstName:    firstName,
+                LastName:     lastName,
+                Username:     username,
+                Email:        email,
+            }
 
-		// If no errors, create the new user
-		newUser := User{
-			FirstName: firstName,
-			LastName:  lastName,
-			Username:  username,
-			Email:     email,
-			Password:  password,
-		}
-		if err := forumDB.Create(&newUser).Error; err != nil {
-			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
-			return
-		}
+            t.Execute(w, data)
+            return
+        }
 
-		http.Redirect(w, r, "/", http.StatusFound)
-	}
+        // If no errors, create the new user
+        newUser := User{
+            FirstName: firstName,
+            LastName:  lastName,
+            Username:  username,
+            Email:     email,
+            Password:  password,
+        }
+        if err := forumDB.Create(&newUser).Error; err != nil {
+            http.Error(w, "Failed to create user.", http.StatusInternalServerError)
+            return
+        }
+
+        http.Redirect(w, r, "/", http.StatusFound)
+    }
 }
+
+// func SignUpHandler(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method == "GET" {
+// 		t, err := template.ParseFiles("signup.html")
+// 		if err != nil {
+// 			log.Println("Error parsing signup.html:", err)
+// 			http.Error(w, "Internal server error", http.StatusInternalServerError)
+// 			return
+// 		}
+// 		t.Execute(w, nil)
+// 		return
+// 	}
+// 
+// 	if r.Method == "POST" {
+// 		firstName := r.FormValue("first_name")
+// 		lastName := r.FormValue("last_name")
+// 		username := r.FormValue("username")
+// 		email := r.FormValue("email")
+// 		password := r.FormValue("password")
+// 
+// 		errorMessage := ""
+// 
+// 		// Check for empty fields
+// 		if firstName == "" || lastName == "" || username == "" || email == "" || password == "" {
+// 			errorMessage = "All fields are required."
+// 		} else {
+// 			// Validate the email domain
+// 			if err := validateEmailDomain(email); err != nil {
+// 				errorMessage = "Invalid email address."
+// 			} else if err := validatePassword(password); err != nil {
+// 				errorMessage = err.Error()
+// 			} else {
+// 				// Check if the username or email already exists
+// 				var existingUser User
+// 				if err := forumDB.Where("username = ? OR email = ?", username, email).First(&existingUser).Error; err == nil {
+// 					errorMessage = "Username or email already exists. Please choose another."
+// 				}
+// 			}
+// 		}
+// 
+// 		// If there is an error, re-render the signup page with the error message
+// 		if errorMessage != "" {
+// 			t, err := template.ParseFiles("signup.html")
+// 			if err != nil {
+// 				log.Println("Error parsing signup.html:", err)
+// 				http.Error(w, "Internal server error", http.StatusInternalServerError)
+// 				return
+// 			}
+// 
+// 			// Pass the error message to the template
+// 			data := struct {
+// 				ErrorMessage string
+// 				FirstName    string
+// 				LastName     string
+// 				Username     string
+// 				Email        string
+// 			}{
+// 				ErrorMessage: errorMessage,
+// 				FirstName:    firstName,
+// 				LastName:     lastName,
+// 				Username:     username,
+// 				Email:        email,
+// 			}
+// 
+// 			t.Execute(w, data)
+// 			return
+// 		}
+// 
+// 		// If no errors, create the new user
+// 		newUser := User{
+// 			FirstName: firstName,
+// 			LastName:  lastName,
+// 			Username:  username,
+// 			Email:     email,
+// 			Password:  password,
+// 		}
+// 		if err := forumDB.Create(&newUser).Error; err != nil {
+// 			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
+// 			return
+// 		}
+// 
+// 		http.Redirect(w, r, "/", http.StatusFound)
+// 	}
+// }
 
 // SignInHandler handles user sign-in.
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
