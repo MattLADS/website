@@ -10,10 +10,12 @@ import (
 
 // User represents a user with a unique ID, username, and password.
 type User struct {
-	ID       uint   `gorm:"primaryKey"`
-	Username string `gorm:"unique"`
-	Email    string `gorm:"unique"`
-	Password string
+	ID        uint   `gorm:"primaryKey"`
+	Username  string `gorm:"unique"`
+	Email     string `gorm:"unique"`
+	Password  string
+	FirstName string
+	LastName  string
 	//flag	 bool
 }
 
@@ -35,6 +37,8 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		t, _ := template.ParseFiles("signup.html")
 		t.Execute(w, nil)
 	} else if r.Method == "POST" {
+		firstName := r.FormValue("first_name")
+		lastName := r.FormValue("last_name")
 		username := r.FormValue("username")
 		email := r.FormValue("email")
 		password := r.FormValue("password")
@@ -45,7 +49,13 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		newUser := User{Username: username, Email: email, Password: password}
+		newUser := User{
+			FirstName: firstName,
+			LastName:  lastName,
+			Username:  username,
+			Email:     email,
+			Password:  password,
+		}
 		if err := forumDB.Create(&newUser).Error; err != nil {
 			http.Error(w, "Failed to create user.", http.StatusInternalServerError)
 			return
@@ -106,6 +116,20 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			Path:    "/",
 		})
 
+		http.SetCookie(w, &http.Cookie{
+			Name:    "first_name",
+			Value:   user.FirstName,
+			Expires: time.Now().Add(24 * time.Hour),
+			Path:    "/",
+		})
+
+		http.SetCookie(w, &http.Cookie{
+			Name:    "last_name",
+			Value:   user.LastName,
+			Expires: time.Now().Add(24 * time.Hour),
+			Path:    "/",
+		})
+
 		http.Redirect(w, r, "/view/", http.StatusFound)
 	}
 }
@@ -135,20 +159,26 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
-	usernameCookie, err1 := r.Cookie("username")
-	emailCookie, err2 := r.Cookie("email")
+	firstNameCookie, err1 := r.Cookie("first_name")
+	lastNameCookie, err2 := r.Cookie("last_name")
+	usernameCookie, err3 := r.Cookie("username")
+	emailCookie, err4 := r.Cookie("email")
 
-	if err1 != nil || err2 != nil {
+	if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
 
 	data := struct {
-		Username string
-		Email    string
+		FirstName string
+		LastName  string
+		Username  string
+		Email     string
 	}{
-		Username: usernameCookie.Value,
-		Email:    emailCookie.Value,
+		FirstName: firstNameCookie.Value,
+		LastName:  lastNameCookie.Value,
+		Username:  usernameCookie.Value,
+		Email:     emailCookie.Value,
 	}
 
 	t, err := template.ParseFiles("edit_profile.html")
@@ -171,6 +201,8 @@ func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 	newUsername := r.FormValue("username")
 	newEmail := r.FormValue("email")
+	newFirstName := r.FormValue("first_name")
+	newLastName := r.FormValue("last_name")
 
 	var user User
 	if err := forumDB.Where("username = ? AND email = ?", currentUsername.Value, currentEmail.Value).First(&user).Error; err != nil {
@@ -181,6 +213,8 @@ func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
 	// Update the user's username and email
 	user.Username = newUsername
 	user.Email = newEmail
+	user.FirstName = newFirstName
+	user.LastName = newLastName
 
 	if err := forumDB.Save(&user).Error; err != nil {
 		http.Error(w, "Failed to update profile", http.StatusInternalServerError)
@@ -198,6 +232,20 @@ func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:    "email",
 		Value:   newEmail,
+		Expires: time.Now().Add(24 * time.Hour),
+		Path:    "/",
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "first_name",
+		Value:   newFirstName,
+		Expires: time.Now().Add(24 * time.Hour),
+		Path:    "/",
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "last_name",
+		Value:   newLastName,
 		Expires: time.Now().Add(24 * time.Hour),
 		Path:    "/",
 	})

@@ -71,12 +71,42 @@ func TopicHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Render the topic page with the retrieved topic and its comments
+	// Fetch the creator's full name
+	var creator User
+	forumDB.Where("username = ?", topic.Username).First(&creator)
+	creatorName := fmt.Sprintf("%s %s", creator.FirstName, creator.LastName)
+
+	// Fetch user details for each comment
+	type TopicData struct {
+		Topic
+		CreatorName string
+		Comments    []struct {
+			Comment
+			UserFullName string
+		}
+	}
+	var topicData TopicData
+	topicData.Topic = topic
+	topicData.CreatorName = creatorName
+
+	for _, comment := range topic.Comments {
+		var user User
+		forumDB.Where("username = ?", comment.Username).First(&user)
+		topicData.Comments = append(topicData.Comments, struct {
+			Comment
+			UserFullName string
+		}{
+			Comment:      comment,
+			UserFullName: fmt.Sprintf("%s %s", user.FirstName, user.LastName),
+		})
+	}
+
+	// Render the topic page with the retrieved data
 	tmpl, err := template.ParseFiles("topic.html")
 	if err != nil {
 		log.Fatal(err)
 	}
-	tmpl.Execute(w, topic)
+	tmpl.Execute(w, topicData)
 }
 
 // NewTopicHandler adds a new topic to the database.

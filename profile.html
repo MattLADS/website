@@ -23,12 +23,14 @@
 </head>
 <body>
     <h1>User Profile</h1>
-    <p>Welcome, {{.Username}}!</p>
+    <p>Welcome, {{.FirstName}} {{.LastName}}!</p>
+    <p>Your Username: {{.Username}}</p>
     <p>Your email: {{.Email}}</p>
     <!-- Edit Profile link -->
     <a href="/edit-profile/">Edit Profile</a>
     <br>
     <a href="/signout/">Sign Out</a>
+    <br>
     <!-- Button to go back to the main page -->
     <button onclick="window.location.href='/'">Go to Main Page</button>
 </body>

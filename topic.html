@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Username}}: {{.Title}}</title>
+    <title>{{.CreatorName}}: {{.Title}}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,7 +31,7 @@
         .new-comment {
             margin-bottom: 20px;
         }
-        .new-comment input, .new-comment textarea {
+        .new-comment textarea {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -57,38 +57,49 @@
             padding: 15px;
             border-bottom: 1px solid #ccc;
         }
-        .comment-list li a {
-            text-decoration: none;
-            color: #333;
+        .comment-list li p {
+            margin: 0;
         }
-        .comment-list li a:hover {
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
             color: #4CAF50;
+        }
+        .back-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>{{.Username}}: {{.Title}}</h1>
+        <h1>{{.CreatorName}}: {{.Title}}</h1>
     </header>
     <div class="container">
+        <p><strong>By:</strong> {{.CreatorName}} ({{.Username}})</p>
         <p>{{.Content}}</p>
-    <div class="new-comment">
-        <!-- Form to post a new topic -->
-        <form method="POST" action="/new-comment/">
-        	<input type="hidden" name="title" value={{.Title}} />
-            <textarea name="comment" placeholder="Write your comment here..." rows="3" required></textarea>
-            <button type="submit">Comment</button>
-        </form>
-    </div>
-    <h2>Comments</h2>
-    <ul class="comment-list">
-        {{range .Comments}}
-        	<li>{{.Username}}: {{ .Content }}</li>
-        {{else}}
-        	<li>No comments yet.</li>
-        {{end}}
-    </ul>
-        <a href="/forum/">Back to Forum</a>
+        
+        <div class="new-comment">
+            <h2>Add a Comment</h2>
+            <form method="POST" action="/new-comment/">
+                <input type="hidden" name="title" value="{{.Title}}">
+                <textarea name="comment" placeholder="Write your comment here..." rows="3" required></textarea>
+                <button type="submit">Comment</button>
+            </form>
+        </div>
+        
+        <h2>Comments</h2>
+        <ul class="comment-list">
+            {{range .Comments}}
+            <li>
+                <p><strong>{{.UserFullName}} ({{.Username}}):</strong> {{.Content}}</p>
+            </li>
+            {{else}}
+            <li>No comments yet.</li>
+            {{end}}
+        </ul>
+        
+        <a href="/forum/" class="back-link">Back to Forum</a>
     </div>
 </body>
 </html>
