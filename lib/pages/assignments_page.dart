@@ -24,7 +24,7 @@ class _AssignmentsPageState extends State<AssignmentsPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:8080/upload-assignment'),
+        Uri.parse('http://localhost:8080/assignments'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
