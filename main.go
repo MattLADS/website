@@ -41,7 +41,15 @@ func goServer() {
 			sqlDB.Close()
 		}
 	}()
-
+	/*
+		//testing forum handler
+		http.Handle("/forum/", enableCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			log.Println("Received request on /forum/")
+			ForumHandler(w, r)
+		})))
+	*/
+	// Register the chatbot handler
+	http.Handle("/chatbot", enableCORS(http.HandlerFunc(ChatbotHandler)))
 	// Set up HTTP handlers for different routes (EDIT: enabling CORS).
 	http.Handle("/signup/", enableCORS(http.HandlerFunc(SignUpHandler)))
 	http.Handle("/", enableCORS(http.HandlerFunc(SignInHandler)))
@@ -59,10 +67,6 @@ func goServer() {
 	//log.Println("Registered /forum/ route")
 	http.Handle("/forum/", enableCORS(http.HandlerFunc(ForumHandler)))
 	http.Handle("/new-topic/", enableCORS(http.HandlerFunc(NewTopicHandler)))
-
-	//http.HandleFunc("/testtopics", TestTopicsHandler)
-	//http.HandleFunc("/testtopics", enableCORS(http.HandlerFunc(TestTopicsHandler)))
-	//http.Handle("/testtopics", enableCORS(http.HandlerFunc(TestTopicsHandler)))
 
 	// New routes for assignments
 	http.Handle("/upload-assignment/", enableCORS(authMiddleware(http.HandlerFunc(UploadAssignmentHandler))))

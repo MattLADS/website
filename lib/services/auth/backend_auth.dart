@@ -54,7 +54,7 @@ class BackendAuthService {
   }
   Future<bool> logout() async {
     final url = Uri.parse('$baseUrl/logout');
-    final response = await http.post(url);
+    final response = await  http.post(url);
 
     if (response.statusCode == 200) {
       // Logout was successful, navigate back to login page
