@@ -24,7 +24,7 @@ class _AssignmentsPageState extends State<AssignmentsPage> {
 
   Future<void> _fetchAssignments() async {
     try {
-      final response = await http.get(Uri.parse('localhost:8080/assignments'));
+      final response = await http.get(Uri.parse('localhost:8080/assignments/'));
       if (response.statusCode == 200) {
         setState(() {
           _assignments.clear();
