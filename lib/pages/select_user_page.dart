@@ -26,7 +26,7 @@ class SelectUserPage extends StatelessWidget {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.background,
+          color: theme.colorScheme.surface,
         ),
         child: ListView.builder(
           itemCount: _users.length,

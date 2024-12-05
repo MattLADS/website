@@ -88,7 +88,7 @@ class ProfilePageState extends State<ProfilePage> {
           Column(
             children: [
               const Text("Classes:", style: TextStyle(fontWeight: FontWeight.bold)),
-              ...widget.classes.map((cls) => Text(cls)).toList(), // Display all classes
+              ...widget.classes.map((cls) => Text(cls)), // Display all classes
             ],
           ),
           /*Row(

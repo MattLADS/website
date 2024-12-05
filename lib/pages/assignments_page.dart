@@ -111,7 +111,7 @@ class _AssignmentsPageState extends State<AssignmentsPage> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
         ),
         child: Column(
           children: [
@@ -150,8 +150,8 @@ class _AssignmentsPageState extends State<AssignmentsPage> {
                   const SizedBox(height: 10),
                   FloatingActionButton(
                     onPressed: _uploadAssignment,
-                    child: const Icon(Icons.upload),
                     backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: const Icon(Icons.upload),
                   ),
                 ],
               ),

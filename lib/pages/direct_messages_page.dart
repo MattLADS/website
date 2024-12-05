@@ -45,7 +45,7 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.background,
+          color: theme.colorScheme.surface,
         ),
         child: Column(
           children: [
@@ -106,8 +106,8 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
                   const SizedBox(width: 10),
                   FloatingActionButton(
                     onPressed: _sendMessage,
-                    child: const Icon(Icons.send),
                     backgroundColor: theme.colorScheme.primary,
+                    child: const Icon(Icons.send),
                   ),
                 ],
               ),

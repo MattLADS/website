@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 // Drawer widget
 
 class MyDrawer extends StatelessWidget {
-  MyDrawer({super.key});
+  const MyDrawer({super.key});
 
 
   void logout(BuildContext context) async {

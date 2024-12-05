@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:matt_lads_app/pages/login_page.dart';
 import 'package:matt_lads_app/pages/register_page.dart';
 import 'package:matt_lads_app/services/auth/backend_auth.dart';

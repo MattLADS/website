@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:matt_lads_app/components/my_loading_circle.dart';
 import 'package:matt_lads_app/components/my_text_field.dart';
 import 'package:matt_lads_app/components/my_button.dart';
 
