@@ -4,6 +4,7 @@ go 1.22.3
 
 require (
 	github.com/google/generative-ai-go v0.19.0
+	github.com/sashabaranov/go-openai v1.36.0
 	google.golang.org/api v0.186.0
 	gorm.io/driver/sqlite v1.5.6
 	gorm.io/gorm v1.25.12
