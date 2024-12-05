@@ -49,7 +49,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
+          color: theme.colorScheme.background,
         ),
         child: Column(
           children: [
@@ -94,7 +94,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                       decoration: InputDecoration(
                         hintText: 'Type a message...',
                         filled: true,
-                        fillColor: Theme.of(context).colorScheme.surface,
+                        fillColor: theme.colorScheme.surface,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,

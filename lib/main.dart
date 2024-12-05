@@ -68,7 +68,6 @@ class PostApp extends StatelessWidget {
         '/assignments': (context) => const AssignmentsPage(),
         '/direct_messages': (context) => SelectUserPage(),
 
-
       },
     );
   }
