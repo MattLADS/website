@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:matt_lads_app/pages/chatbot_page.dart';
 import 'package:matt_lads_app/pages/assignments_page.dart';
-import 'package:matt_lads_app/pages/direct_messages_page.dart';
-import 'package:matt_lads_app/pages/login_page.dart';
 import 'package:matt_lads_app/pages/select_user_page.dart';
 import 'package:matt_lads_app/services/auth/auth_gate.dart';
 import 'package:provider/provider.dart';
@@ -12,8 +10,6 @@ import 'package:matt_lads_app/pages/profile.dart';
 import 'package:matt_lads_app/pages/register_page.dart';
 import 'package:matt_lads_app/pages/settings.dart';
 import 'package:matt_lads_app/services/auth/backend_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer';
 
 
 void main() async {

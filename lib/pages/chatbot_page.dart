@@ -49,7 +49,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.background,
+          color: theme.colorScheme.surface,
         ),
         child: Column(
           children: [
@@ -106,8 +106,8 @@ class _ChatbotPageState extends State<ChatbotPage> {
                   const SizedBox(width: 10),
                   FloatingActionButton(
                     onPressed: _sendMessage,
-                    child: const Icon(Icons.send),
                     backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: const Icon(Icons.send),
                   ),
                 ],
               ),

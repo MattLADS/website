@@ -122,8 +122,8 @@ class HomePageState extends State<HomePage> {
           print("floating action button pressed");
           newPostButtonInfo();
         },
-        child: const Icon(Icons.add),
         tooltip: 'Create New Post',
+        child: const Icon(Icons.add),
       ),
     );
   }
