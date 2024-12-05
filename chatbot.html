@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatAI</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff; /* White background */
+            color: black;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%; /* Full screen height */
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto; /* Enable scrolling */
+            padding: 20px;
+            background-color: #f9f9f9; /* Light gray for chat history */
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .chat-message {
+            margin: 10px 0;
+            word-wrap: break-word;
+        }
+
+        .chat-message strong {
+            color: blue;
+        }
+
+        .chat-input-container {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: #dddddd; /* Light gray for input area */
+        }
+
+        #chat-input {
+            flex: 1; /* Take up all available space */
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        #send-button {
+            padding: 10px 20px;
+            background-color: #007bff; /* Bootstrap primary blue */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div id="chat-history" class="chat-history"></div>
+        <div class="chat-input-container">
+            <input type="text" id="chat-input" placeholder="Type your message here..." />
+            <button id="send-button" onclick="askChatAI()">Ask</button>
+        </div>
+    </div>
+</body>
+</html>
