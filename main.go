@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+var chatbot *ChatBot
+
 func enableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin") // Get the Origin from the request
@@ -33,6 +35,9 @@ func enableCORS(next http.Handler) http.Handler {
 
 //export goServer
 func goServer() {
+	// Initialize chatbot before starting the server.
+	InitializeChatBot()
+
 	// Load existing user credentials from the database at startup.
 	InitializeForumDB()
 	defer func() {
@@ -49,24 +54,26 @@ func goServer() {
 		})))
 	*/
 	// Register the chatbot handler
+	http.Handle("/chatbot/openai", enableCORS(http.HandlerFunc(OpenAIHandler)))
 	http.Handle("/chatbot", enableCORS(http.HandlerFunc(ChatbotHandler)))
 	// Set up HTTP handlers for different routes (EDIT: enabling CORS).
 	http.Handle("/signup/", enableCORS(http.HandlerFunc(SignUpHandler)))
 	http.Handle("/", enableCORS(http.HandlerFunc(SignInHandler)))
 	http.Handle("/signout/", enableCORS(http.HandlerFunc(SignOutHandler)))
-	//http.Handle("/forum/", enableCORS(authMiddleware(http.HandlerFunc(ForumHandler))))
 	http.Handle("/profile/", enableCORS(authMiddleware(http.HandlerFunc(profileHandler))))
 	http.Handle("/topic/", enableCORS(authMiddleware(http.HandlerFunc(TopicHandler))))
-	//http.Handle("/new-topic/", enableCORS(authMiddleware(http.HandlerFunc(NewTopicHandler))))
 	http.Handle("/new-comment/", enableCORS(authMiddleware(http.HandlerFunc(NewCommentHandler))))
 	http.Handle("/view/", enableCORS(authMiddleware(http.HandlerFunc(ViewHandler))))
 	http.Handle("/edit/", enableCORS(authMiddleware(http.HandlerFunc(EditHandler))))
 	http.Handle("/save/", enableCORS(authMiddleware(http.HandlerFunc(SaveHandler))))
 	http.Handle("/auth/status", enableCORS(http.HandlerFunc(AuthStatusHandler)))
 	http.HandleFunc("/logout/", SignOutHandler)
-	//log.Println("Registered /forum/ route")
 	http.Handle("/forum/", enableCORS(http.HandlerFunc(ForumHandler)))
 	http.Handle("/new-topic/", enableCORS(http.HandlerFunc(NewTopicHandler)))
+	http.Handle("/fetch-users", enableCORS(authMiddleware(http.HandlerFunc(FetchUsersHandler))))
+	// Other existing routes.
+	http.Handle("/send-message", enableCORS(authMiddleware(http.HandlerFunc(SendMessageHandler))))
+	http.Handle("/get-messages", enableCORS(authMiddleware(http.HandlerFunc(GetMessagesHandler))))
 
 	// New routes for assignments
 	http.Handle("/upload-assignment/", enableCORS(authMiddleware(http.HandlerFunc(UploadAssignmentHandler))))

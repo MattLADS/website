@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLADS</title>
     <style>
-        /* Styling for the main body */
         body {
-            background-color: #006400; /* Dark green */
-            color: white;
+            background-color: #ffffff; /* White background */
+            color: #000000; /* Black text */
             display: flex;
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            font-family: Arial, sans-serif;
         }
 
-        /* Sidebar styling */
         .sidebar {
             height: 100vh;
             width: 250px;
@@ -27,13 +27,6 @@
             color: white;
         }
 
-        /* Content container inside the sidebar */
-        .sidebar-content {
-            flex: 1; /* Allow the content area to grow and take up available space */
-            margin-bottom: 50px; /* Space for the button */
-        }
-
-        /* Sidebar title styling */
         .sidebar-title {
             font-size: 24px;
             font-weight: bold;
@@ -42,7 +35,6 @@
             margin-bottom: 20px;
         }
 
-        /* Sidebar options link styling */
         .sidebar-options a {
             text-decoration: none;
             color: white;
@@ -54,12 +46,27 @@
             cursor: pointer;
         }
 
-        /* Hover effect for sidebar options */
         .sidebar-options a:hover {
             background-color: #1a6e1a;
         }
 
-        /* Main content area styling */
+        .sign-out-button {
+            background-color: gold;
+            color: black;
+            border: none;
+            padding: 10px;
+            margin-top: 100px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .sign-out-button:hover {
+            background-color: #ffd700;
+            transform: translateY(-2px);
+        }
+
         .content {
             margin-left: 270px;
             padding: 20px;
@@ -67,164 +74,149 @@
             overflow-y: auto;
         }
 
-        /* Dynamic content box styling */
         .dynamic-content {
-            background-color: #004d00;
+            background-color: #f9f9f9; /* Light gray */
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
-        /* Header styling */
-        h2 {
-            margin: 0 0 10px 0;
-            color: gold;
-        }
-
-        /* Calendar container styling */
-        .calendar-container {
+        .chat-container {
             display: flex;
             flex-direction: column;
-            align-items: center;
-        }
-
-        /* Calendar header (month navigation) */
-        .calendar-header {
-            display: flex;
             justify-content: space-between;
+            height: 80vh;
+            background-color: #cccccc;
+            border: 1px solid #ccc;
+    		border-radius: 8px;
+        }
+
+.chat-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: #cccccc !important; /* Light grey with !important to override other styles */
+    border: 1px solid #ccc;
+    color: #333;
+    border-radius: 5px;
+}
+
+        .chat-message {
+            margin: 10px 0;
+            word-wrap: break-word;
+        }
+
+        .chat-message strong {
+            color: blue;
+        }
+
+        .chat-input-container {
+            display: flex;
             align-items: center;
-            width: 100%;
-            max-width: 500px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        /* Calendar grid layout */
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr); /* 7 columns for the days of the week */
-            gap: 5px;
-            text-align: center;
-            max-width: 500px;
-        }
-
-        /* Weekday label styling */
-        .weekday {
-            font-weight: bold;
-            color: gold;
-            margin-bottom: 5px;
-        }
-
-        /* Individual day styling */
-        .day {
             padding: 10px;
-            border-radius: 4px;
-            background-color: #2e8b57; /* Medium green for days */
-            color: white;
-            cursor: pointer;
+            background-color: #dddddd;
+            border-top: 1px solid #ccc;
         }
 
-        /* Highlight today's date */
-        .day.today {
-            background-color: gold; /* Highlight today's date */
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        #send-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+
+		     h2 {
+            margin: 0 0 10px 0;
             color: black;
         }
 
-        /* Highlight days with events */
-        .day.event {
-            background-color: #ffa500; /* Orange for days with events */
+        .user-list {
+            margin-bottom: 20px;
         }
 
-        /* Event list styling */
-        .event-list {
-            margin-top: 20px;
-            background-color: #003300; /* Dark green for event list */
+        .user-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .user-list li {
             padding: 10px;
-            border-radius: 8px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        /* Individual event item styling */
-        .event-item {
-            padding: 5px;
-            margin: 5px 0;
-            background-color: #006400; /* Green for event items */
-            border-radius: 4px;
-            color: white;
-        }
-
-        /* Form styling for adding events */
-        .add-event-form {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        /* Input and button styling in add-event form */
-        .add-event-form input,
-        .add-event-form button {
-            padding: 8px;
-            border-radius: 4px;
-            border: none;
-        }
-
-        /* Input field for adding events */
-        .add-event-form input {
-            flex: 1;
-        }
-
-        /* Add event button styling */
-        .add-event-form button {
-            background-color: blue; /* Blue for buttons */
-            color: white;
+            background-color: #228B22;
+            margin-bottom: 5px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        /* Hover effect for add event button */
-        .add-event-form button:hover {
-            background-color: darkblue; /* Dark blue on hover */
+        .user-list li:hover,
+        .user-list li.selected {
+            background-color: #1a6e1a;
+            color: white;
         }
 
-        /* Navigation button styling for month navigation */
-        .nav-button {
+        .chat-window {
+            margin-top: 20px;
+        }
+
+        .chat-history {
+            border: 1px solid #ccc;
+            height: 300px;
+            overflow-y: auto;
+            background-color: #003300;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .chat-message {
+            margin: 5px 0;
+        }
+
+        .chat-message strong {
+            color: blue;
+        }
+
+        #message-input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin-right: 10px;
+        }
+
+        #send-button {
+            padding: 10px;
             background-color: blue;
             color: white;
             border: none;
-            padding: 5px 10px;
+            border-radius: 5px;
             cursor: pointer;
-            border-radius: 4px;
         }
 
-        /* Hover effect for navigation buttons */
-        .nav-button:hover {
+        #send-button:hover {
             background-color: darkblue;
-        }
-
-		/* Sign out button styling */
-		.sign-out-button {
- 		   background-color: gold; /* Gold color for sign out button */
- 		   color: black; /* Black text for contrast */
-  		  border: none;
-  		  padding: 10px;
-  		  margin-top: 100%;
-  		  border-radius: 5px;
-  		  cursor: pointer;
-  		  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Raised effect */
-  		  transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
-		}
-
-        /* Hover effect for sign out button */
-        .sign-out-button:hover {
-            background-color: #ffd700; /* Brighter gold on hover */
-            transform: translateY(-2px); /* Lift effect on hover */
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar with navigation options -->
     <div class="sidebar">
-        <div class="sidebar-title">MATTLADS</div>
+        <div class="sidebar-title">KLADS</div>
         <div class="sidebar-options">
             <a onclick="showContent('class-feed')">Class Feed</a>
             <a onclick="showContent('notifications')">Notifications</a>
@@ -234,12 +226,11 @@
             <a onclick="showContent('settings')">Settings</a>
             <a onclick="window.location.href='/forum/'">Forum</a>
             <a onclick="window.location.href='/profile/'">Profile</a>
+            <a onclick="showContent('chatAI')">ChatAI</a>
         </div>
-        <!-- Sign out button -->
         <button class="sign-out-button" onclick="window.location.href='/signout/'">Sign Out</button>
     </div>
 
-    <!-- Main content area -->
     <div class="content">
         <div id="dynamic-content" class="dynamic-content">
             <h2>Welcome!</h2>
@@ -248,44 +239,35 @@
     </div>
 
     <script>
-        // Initialize an object to store events
-        let events = {};
-
-        // Function to display content based on selected option
         function showContent(option) {
             const content = document.getElementById('dynamic-content');
-            let title, text;
-
-            // Check which option was selected and display relevant content
-            if (option === 'calendar') {
+            if (option === 'dms') {
                 content.innerHTML = `
-                    <h2>Calendar</h2>
-                    <div class="calendar-container">
-                        <div class="calendar-header">
-                            <button class="nav-button" onclick="changeMonth(-1)">&#9664;</button>
-                            <span id="calendar-title"></span>
-                            <button class="nav-button" onclick="changeMonth(1)">&#9654;</button>
-                        </div>
-                        <div class="calendar">
-                            <div class="weekday">Sun</div>
-                            <div class="weekday">Mon</div>
-                            <div class="weekday">Tue</div>
-                            <div class="weekday">Wed</div>
-                            <div class="weekday">Thu</div>
-                            <div class="weekday">Fri</div>
-                            <div class="weekday">Sat</div>
-                            <div id="calendar-grid" class="calendar-grid"></div>
-                        </div>
-                        <div class="add-event-form">
-                            <input type="text" id="event-input" placeholder="Add an event...">
-                            <button onclick="addEvent()">Add Event</button>
-                        </div>
-                        <div id="event-list" class="event-list"></div>
+                    <h2>Direct Messages</h2>
+                    <div class="user-list">
+                        <h3>Users</h3>
+                        <ul id="users"></ul>
                     </div>
-                    `;
-                renderCalendar();
+                    <div class="chat-window">
+                        <h3>Chat</h3>
+                        <div id="chat-history" class="chat-history"></div>
+                        <input type="text" id="message-input" placeholder="Type a message..." />
+                        <button id="send-button" onclick="sendMessage()">Send</button>
+                    </div>
+                `;
+                fetchUsers();
+            } else if (option === 'chatAI') {
+                content.innerHTML = `
+                    <div class="chat-container">
+                        <div id="chat-history" class="chat-history"></div>
+                        <div class="chat-input-container">
+                            <input type="text" id="chat-input" placeholder="Type your message here..." />
+                            <button id="send-button" onclick="askChatAI()">Ask</button>
+                        </div>
+                    </div>
+                `;
             } else {
-                // Display text content for other options
+                let title, text;
                 switch (option) {
                     case 'class-feed':
                         title = 'Class Feed';
@@ -294,10 +276,6 @@
                     case 'notifications':
                         title = 'Notifications';
                         text = 'Here are your latest notifications.';
-                        break;
-                    case 'dms':
-                        title = 'Direct Messages';
-                        text = 'Check your direct messages here.';
                         break;
                     case 'search':
                         title = 'Search';
@@ -315,25 +293,201 @@
             }
         }
 
-        // Function to change the displayed month in the calendar
-        function changeMonth(direction) {
-            // Logic to change the month
+				async function fetchUsers() {
+			    try {
+			        const response = await fetch('/fetch-users');
+			        if (!response.ok) {
+			            throw new Error(`Failed to fetch users: ${response.statusText}`);
+			        }
+			
+			        const users = await response.json();
+			        const userList = document.getElementById('users'); // Matches the `<ul id="users">` in HTML
+			
+			        if (users.length === 0) {
+			            userList.innerHTML = '<li>No users available</li>';
+			            return;
+			        }
+			
+			        // Populate users list
+			        userList.innerHTML = users
+			            .map(user => `<li onclick="selectUser('${user.Username}')">${user.Username}</li>`)
+			            .join('');
+			    } catch (error) {
+			        console.error(error.message);
+			    }
+			}
+				
+			
+			async function fetchMessages(recipient) {
+			    console.log(`Fetching messages for recipient: ${recipient}`); // Debugging
+			    try {
+			        const response = await fetch(`/get-messages?recipient=${encodeURIComponent(recipient)}`);
+			        if (!response.ok) {
+			            console.error('Failed to fetch messages:', await response.text());
+			            return;
+			        }
+			
+			        const messages = await response.json();
+			        const chatHistory = document.getElementById('chat-history');
+			
+			        // Populate chat history
+			        chatHistory.innerHTML = messages
+			            .map(msg => `<p class="chat-message"><strong>${msg.Sender}:</strong> ${msg.Content}</p>`)
+			            .join('');
+			
+			        // Scroll to the bottom
+			        chatHistory.scrollTop = chatHistory.scrollHeight;
+			    } catch (error) {
+			        console.error('Error fetching messages:', error);
+			    }
+			}
+			
+		let chatPollingInterval;
+		
+		function startChatPolling(recipient) {
+		    if (chatPollingInterval) clearInterval(chatPollingInterval);
+		
+		    chatPollingInterval = setInterval(() => {
+		        fetchMessages(recipient);
+		    }, 3000); // Poll every 3 seconds
+		}
+		
+		function selectUser(username) {
+		    // Clear previous selection
+		    document.querySelectorAll('#users li').forEach(li => li.classList.remove('selected'));
+		
+		    // Highlight selected user
+		    const selectedUser = Array.from(document.querySelectorAll('#users li')).find(
+		        li => li.textContent.trim() === username
+		    );
+		    if (selectedUser) {
+		        selectedUser.classList.add('selected');
+		    }
+		
+		    // Fetch messages and start polling
+		    fetchMessages(username);
+		    startChatPolling(username);
+		}
+		
+			   async function sendMessage() {
+			       const messageInput = document.getElementById('message-input');
+			       const content = messageInput.value.trim();
+			       const recipient = document.querySelector('#users li.selected')?.textContent;
+			   
+			       if (!recipient || !content) {
+			           alert('Select a user and type a message.');
+			           return;
+			       }
+			   
+			       try {
+			           const response = await fetch('/send-message', {
+			               method: 'POST',
+			               headers: { 'Content-Type': 'application/json' },
+			               body: JSON.stringify({ recipient, content }),
+			           });
+			   
+			           if (!response.ok) {
+			               console.error('Failed to send message:', await response.text());
+			               alert('Failed to send message.');
+			               return;
+			           }
+			   
+			           // Clear the input box
+			           messageInput.value = '';
+			   
+			           // Append the message to the chat history immediately
+			           const chatHistory = document.getElementById('chat-history');
+			           const newMessage = document.createElement('p');
+			           newMessage.classList.add('chat-message');
+			           newMessage.innerHTML = `<strong>You:</strong> ${content}`;
+			           chatHistory.appendChild(newMessage);
+			   
+			           // Scroll to the bottom of the chat history
+			           chatHistory.scrollTop = chatHistory.scrollHeight;
+			       } catch (error) {
+			           console.error('Error sending message:', error);
+			       }
+			   }
+
+
+			   async function fetchUnreadCounts() {
+			       try {
+			           const response = await fetch('/fetch-unread-counts');
+			           if (!response.ok) return;
+			   
+			           const unreadCounts = await response.json();
+			           unreadCounts.forEach(user => {
+			               const userElement = document.querySelector(`#users li[data-username="${user.username}"]`);
+			               if (userElement) {
+			                   const badge = userElement.querySelector('.badge') || document.createElement('span');
+			                   badge.className = 'badge';
+			                   badge.textContent = user.unreadCount;
+			                   userElement.appendChild(badge);
+			               }
+			           });
+			       } catch (error) {
+			           console.error('Error fetching unread counts:', error);
+			       }
+			   }
+			   							
+		    document.addEventListener('click', function (e) {
+		        if (e.target.closest('#users li')) {
+		            selectUser(e.target.textContent.trim());
+		        }
+		    });
+
+async function askChatAI() {
+    const chatInput = document.getElementById('chat-input');
+    const question = chatInput.value.trim();
+
+    if (!question) {
+        alert('Please enter a message.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/chatbot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question }),
+        });
+
+        if (!response.ok) {
+            console.error('Failed to fetch response:', await response.text());
+            alert('Error communicating with ChatAI.');
+            return;
         }
 
-        // Function to render the calendar
-        function renderCalendar() {
-            // Logic to render the calendar
-        }
+        const data = await response.json();
+        const chatHistory = document.getElementById('chat-history');
 
-        // Function to add an event to the calendar
-        function addEvent() {
-            const eventInput = document.getElementById('event-input');
-            const eventValue = eventInput.value.trim();
-            if (eventValue) {
-                // Logic to add the event
-                eventInput.value = ''; // Clear the input field
-            }
-        }
+        // Append user's question
+        chatHistory.innerHTML += `<p class="chat-message"><strong>You:</strong> ${question}</p>`;
+
+        // Format the response with clickable links
+        const formattedResponse = data.response
+            .split(/(?=\d+\.\s)/) // Split by numbered list items (e.g., "1. ", "2. ")
+            .map(item => {
+                const urlRegex = /(https?:\/\/[^\s]+)/g; // Regex to identify URLs
+                const formattedItem = item.replace(
+                    urlRegex,
+                    url => `<a href="${url}" target="_blank">${url}</a>` // Wrap URLs in <a> tags
+                );
+                return `<p class="chat-message">${formattedItem}</p>`; // Wrap each item in a paragraph
+            })
+            .join(''); // Combine into a single string
+
+        // Append ChatAI's response
+        chatHistory.innerHTML += `<p class="chat-message"><strong>ChatAI:</strong></p>${formattedResponse}`;
+
+        // Clear input and scroll to the bottom
+        chatInput.value = '';
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    } catch (error) {
+        console.error('Error interacting with ChatAI:', error);
+        alert('Error processing your request.');
+    }
+}
     </script>
 </body>
 </html>
