@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:matt_lads_app/pages/chatbot_page.dart';
 import 'package:matt_lads_app/pages/assignments_page.dart';
+import 'package:matt_lads_app/pages/direct_messages_page.dart';
 import 'package:matt_lads_app/pages/login_page.dart';
+import 'package:matt_lads_app/pages/select_user_page.dart';
 import 'package:matt_lads_app/services/auth/auth_gate.dart';
 import 'package:provider/provider.dart';
 import 'package:matt_lads_app/themes/theme_provider.dart';
@@ -64,7 +66,7 @@ class PostApp extends StatelessWidget {
         '/settings': (context) => const Settings(),
         '/chatbot': (context) => const ChatbotPage(),
         '/assignments': (context) => const AssignmentsPage(),
-
+        '/direct_messages': (context) => SelectUserPage(),
 
       },
     );

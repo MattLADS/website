@@ -10,8 +10,6 @@ import 'package:http/http.dart' as http;
 class MyDrawer extends StatelessWidget {
   MyDrawer({super.key});
 
-  //logout auth w/firebase
-  //final _auth = AuthService();
 
   void logout(BuildContext context) async {
     try {
@@ -107,14 +105,16 @@ class MyDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/assignments');
             },
           ),
-
-          //search list
+          
           MyDrawerTile(
-            title: "S E A R C H",
-            icon: Icons.search,
-            onTap: () {}, 
-            
-          ), 
+            title: "M E S S A G E S",
+            icon: Icons.chat_bubble,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/direct_messages');
+            },
+          ),
+
           //settings
           MyDrawerTile(
             title: "S E T T I N G S",
