@@ -68,10 +68,6 @@ func goServer() {
 	http.Handle("/forum/", enableCORS(http.HandlerFunc(ForumHandler)))
 	http.Handle("/new-topic/", enableCORS(http.HandlerFunc(NewTopicHandler)))
 
-	//http.HandleFunc("/testtopics", TestTopicsHandler)
-	//http.HandleFunc("/testtopics", enableCORS(http.HandlerFunc(TestTopicsHandler)))
-	//http.Handle("/testtopics", enableCORS(http.HandlerFunc(TestTopicsHandler)))
-
 	// New routes for assignments
 	http.Handle("/upload-assignment/", enableCORS(authMiddleware(http.HandlerFunc(UploadAssignmentHandler))))
 	http.Handle("/assignments/", enableCORS(authMiddleware(http.HandlerFunc(ListAssignmentsHandler))))
