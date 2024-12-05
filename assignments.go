@@ -163,10 +163,4 @@ func UpdateAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/assignments/", http.StatusSeeOther)
 	}
-
-	http.HandleFunc("/upload-assignment", UploadAssignmentHandler)
-	http.HandleFunc("/edit-assignment", EditAssignmentHandler)
-	http.HandleFunc("/delete-assignment", DeleteAssignmentHandler)
-	http.ListenAndServe(":8080", nil)
-
 }
