@@ -7,10 +7,10 @@ class SelectUserPage extends StatelessWidget {
   SelectUserPage({super.key});
 
   final List<String> _users = [
-    'User1',
-    'User2',
-    'User3',
-    'User4',
+    'K U N J  P.',
+    'A B I  M.',
+    'L I W A M  T.',
+    'D U N C A N  B.',
   ];
 
   @override
