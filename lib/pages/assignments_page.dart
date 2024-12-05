@@ -45,7 +45,7 @@ class _AssignmentsPageState extends State<AssignmentsPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:8080/upload-assignment'),
+        Uri.parse('http://localhost:8080/assignments'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
@@ -147,19 +147,6 @@ class _AssignmentsPageState extends State<AssignmentsPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  TextField(
-                    controller: _filePathController,
-                    decoration: InputDecoration(
-                      hintText: 'File Path',
-                      filled: true,
-                      fillColor: Theme.of(context).colorScheme.surface,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    ),
-                  ),
                   const SizedBox(height: 10),
                   FloatingActionButton(
                     onPressed: _uploadAssignment,

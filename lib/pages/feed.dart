@@ -3,8 +3,8 @@ import 'package:matt_lads_app/components/my_drawer.dart';
 import '../services/database/forum_service.dart';
 import 'dart:developer';
 
-
 class HomePage extends StatefulWidget {
+  @override
   const HomePage({super.key});
 
   @override
@@ -12,7 +12,6 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-
   final ForumService forumService = ForumService();
   late Future<List<Map<String, dynamic>>> topicsFuture;
 
@@ -48,42 +47,70 @@ class HomePageState extends State<HomePage> {
           } else {
             log("FutureBuilder received data: ${snapshot.data}");
             List<Map<String, dynamic>> topics = snapshot.data!;
-            //log("FutureBuilder received data: $topics");
             return ListView.builder(
               itemCount: topics.length,
               itemBuilder: (context, index) {
                 final topic = topics[index];
-                final title = topic['Title'] ?? 'Untitled Post'; // Provide a default if null
-                final content = topic['Content'] ?? 'No Content'; // Provide a default if null
-                final username = topic['Username'] ?? 'Unknown User'; // Provide a default if null
+                final title = topic['Title'] ?? 'Untitled Post';
+                final content = topic['Content'] ?? 'No Content';
+                final username = topic['Username'] ?? 'Unknown User';
 
-                return ListTile(
-                  title: Text(title),
-                  subtitle: Text("Author: @$username\n$content"),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text(title),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text("Author: @$username"),
-                              const SizedBox(height: 10),
-                              Text(content),
-                            ],
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('Close'),
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text(title),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text("Author: @$username"),
+                                const SizedBox(height: 10),
+                                Text(content),
+                              ],
                             ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('C L O S E'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Author: @$username",
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            content,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 );
               },
             );
@@ -95,7 +122,7 @@ class HomePageState extends State<HomePage> {
           print("floating action button pressed");
           newPostButtonInfo();
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         tooltip: 'Create New Post',
       ),
     );
@@ -132,16 +159,16 @@ class HomePageState extends State<HomePage> {
               onPressed: () async {
                 final title = postTopic.text;
                 final content = postContent.text;
-                
+
                 if (title.isNotEmpty && content.isNotEmpty) {
-                  try{
+                  try {
                     await ForumService().postTopic(title, content);
                     Navigator.of(context).pop();
                     setState(() {
-                        // Refresh feed after post
-                        topicsFuture = ForumService().fetchTopics();
-                     });
-                  } catch(e){
+                      // Refresh feed after post
+                      topicsFuture = ForumService().fetchTopics();
+                    });
+                  } catch (e) {
                     log('Error submitting post: $e');
                     showDialog(
                       context: context,
@@ -157,30 +184,30 @@ class HomePageState extends State<HomePage> {
                       ),
                     );
                   }
-                  } else {
-                    log('Title or content is empty');
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Error'),
-                        content: Text('Title and content cannot be empty.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                },
+                } else {
+                  log('Title or content is empty');
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Error'),
+                      content: const Text('Title and content cannot be empty.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
               child: const Text('Submit'),
             ),
           ],
         );
       },
     ).then((_) {
-      log('Dialog dismissed'); // Log when dialog is closed
+      log('Dialog dismissed');
     });
   }
 }

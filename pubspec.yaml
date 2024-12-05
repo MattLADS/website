@@ -38,6 +38,7 @@ dependencies:
   process_run: ^1.2.2
 
   image_picker: ^1.1.2
+  file_picker: ^5.0.0
   cached_network_image: ^3.1.0
 
   # The following adds the Cupertino Icons font to your application.
