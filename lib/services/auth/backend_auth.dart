@@ -6,12 +6,12 @@ class BackendAuthService {
   static const String baseUrl = 'http://localhost:8080';
 
   // Register with backend
-  Future<bool> register(String username, String password) async {
+  Future<bool> register(String username, String password, String email) async {
     final url = Uri.parse('$baseUrl/signup/');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({'username': username, 'password': password}),
+      body: json.encode({'username': username, 'password': password, 'email': email}),
     );
     
     print('Registration status code: ${response.statusCode}');

@@ -3,7 +3,7 @@ import 'package:matt_lads_app/components/my_text_field.dart';
 import 'package:matt_lads_app/components/my_button.dart';
 
 class RegisterPage extends StatefulWidget {
-  final void Function(String username, String password) onRegister;
+  final void Function(String username, String password, String email) onRegister;
   final VoidCallback onLogin; // Callback for switching to the login page
 
   const RegisterPage({
@@ -17,17 +17,19 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController userController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
   void register() {
-    final username = emailController.text;
+    final username = userController.text;
+    final email = emailController.text;
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
 
     if (password == confirmPassword) {
-      widget.onRegister(username, password);
+      widget.onRegister(username, password, email);
     } else {
       showDialog(
         context: context,
@@ -62,8 +64,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         fontSize: 20)),
                 const SizedBox(height: 25),
                 MyTextField(
+                  controller: userController,
+                  hintText: "Enter username",
+                  obscureText: false,
+                ),
+                MyTextField(
                   controller: emailController,
-                  hintText: "Enter email or username",
+                  hintText: "Enter email",
                   obscureText: false,
                 ),
                 const SizedBox(height: 10),

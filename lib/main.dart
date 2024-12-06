@@ -47,9 +47,9 @@ class PostApp extends StatelessWidget {
         },
         
         '/register': (context) => RegisterPage(
-          onRegister: (username, password) async {
+          onRegister: (username, password, email) async {
             try {
-              await authService.register(username, password);
+              await authService.register(username, password, email);
               Navigator.of(context).pushReplacementNamed('/forum/');
             } catch (e) {
               print(e); // Handle error (e.g., show a dialog)
