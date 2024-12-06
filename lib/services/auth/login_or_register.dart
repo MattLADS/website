@@ -56,9 +56,9 @@ class LoginOrRegister extends StatefulWidget {
       );
     }
   }
-  Future<void> register(String username, String password) async {
+  Future<void> register(String username, String password, String email) async {
     try {
-      bool success = await authService.register(username, password);
+      bool success = await authService.register(username, password, email);
       if (success) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('username', username);
