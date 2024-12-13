@@ -48,7 +48,9 @@ The platform utilizes a relational database to manage and store essential data:
 1. Clone the repository:  
 
    `git clone git@github.com:MattLADS/website.git`
+   
    `cd website`
+   
    `git checkout KpathaK`
 
 4. Run the project:  
